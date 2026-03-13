@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
-import { LogIn, User, Lock, ShieldCheck, ArrowLeft } from 'lucide-react';
+import { LogIn, User, Lock, ShieldCheck, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -10,6 +10,7 @@ export default function LoginPage() {
   const [role, setRole] = useState<'admin' | 'employee'>('admin');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -87,8 +88,9 @@ export default function LoginPage() {
               <input
                 type="email"
                 required
+                autoComplete="off"
                 className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white"
-                placeholder="admin@corebiz.com"
+                placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -100,13 +102,21 @@ export default function LoginPage() {
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 required
-                className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white"
-                placeholder="••••••••"
+                autoComplete="new-password"
+                className="w-full pl-10 pr-12 py-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white"
+                placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
             </div>
           </div>
 
@@ -122,10 +132,7 @@ export default function LoginPage() {
             )}
           </button>
 
-          <div className="pt-4 text-center space-y-4">
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Default Admin: admin@corebiz.com / admin123
-            </p>
+          <div className="pt-4 text-center">
             <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
               <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">Don't have a store yet?</p>
               <button

@@ -9,11 +9,12 @@ import {
   Upload, 
   CheckCircle2, 
   AlertCircle,
-  Loader2
+  Loader2,
+  DollarSign
 } from 'lucide-react';
 import api from '../services/api';
 
-type Section = 'profile' | 'billing' | 'inventory' | 'appearance' | 'security';
+type Section = 'profile' | 'billing' | 'inventory' | 'salary' | 'appearance' | 'security';
 
 export default function SettingsPage() {
   const [activeSection, setActiveSection] = useState<Section>('profile');
@@ -33,6 +34,10 @@ export default function SettingsPage() {
     lowStockThreshold: 5, criticalStockThreshold: 2, enableNotifications: true
   });
 
+  const [salaryData, setSalaryData] = useState({
+    defaultSalesSalary: 0, defaultManagerSalary: 0, defaultHelperSalary: 0
+  });
+
   const [securityData, setSecurityData] = useState({
     currentPassword: '', newPassword: '', confirmPassword: ''
   });
@@ -48,12 +53,16 @@ export default function SettingsPage() {
   const fetchData = async () => {
     setFetching(true);
     try {
-      const [storeRes, settingsRes] = await Promise.all([
+      const [storeRes, settingsRes, salaryRes] = await Promise.all([
         api.get('/api/store'),
-        api.get('/api/settings/all')
+        api.get('/api/settings/all'), // This returns all store settings
+        api.get('/api/settings/employee-salary')
       ]);
       
       setStoreData(storeRes.data);
+      if (salaryRes.data) {
+        setSalaryData(salaryRes.data);
+      }
       if (settingsRes.data.id) {
         setBillingData({
           currency: settingsRes.data.currency,
@@ -117,7 +126,18 @@ export default function SettingsPage() {
       setLoading(false);
     }
   };
-
+  const handleUpdateSalary = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await api.put('/api/settings/employee-salary', salaryData);
+      showToast('Salary defaults saved');
+    } catch (err: any) {
+      showToast('Failed to save salary settings', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (securityData.newPassword !== securityData.confirmPassword) {
@@ -159,6 +179,7 @@ export default function SettingsPage() {
     { id: 'profile', name: 'Store Profile', icon: Store },
     { id: 'billing', name: 'Billing & Tax', icon: CreditCard },
     { id: 'inventory', name: 'Inventory Settings', icon: Box },
+    { id: 'salary', name: 'Salary Configuration', icon: DollarSign },
     { id: 'appearance', name: 'Appearance', icon: Palette },
     { id: 'security', name: 'Security', icon: Lock },
   ];
@@ -392,6 +413,49 @@ export default function SettingsPage() {
                     className="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2"
                   >
                     {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Save className="w-5 h-5" /> Save Inventory Rules</>}
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {activeSection === 'salary' && (
+              <form onSubmit={handleUpdateSalary} className="p-8 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Sales Basic Salary</label>
+                    <input 
+                      type="number"
+                      className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white"
+                      value={salaryData.defaultSalesSalary}
+                      onChange={e => setSalaryData({...salaryData, defaultSalesSalary: parseFloat(e.target.value)})}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Manager Basic Salary</label>
+                    <input 
+                      type="number"
+                      className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white"
+                      value={salaryData.defaultManagerSalary}
+                      onChange={e => setSalaryData({...salaryData, defaultManagerSalary: parseFloat(e.target.value)})}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Helper Basic Salary</label>
+                    <input 
+                      type="number"
+                      className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white"
+                      value={salaryData.defaultHelperSalary}
+                      onChange={e => setSalaryData({...salaryData, defaultHelperSalary: parseFloat(e.target.value)})}
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-4">
+                  <button 
+                    disabled={loading}
+                    className="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2"
+                  >
+                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Save className="w-5 h-5" /> Save Salary Rules</>}
                   </button>
                 </div>
               </form>

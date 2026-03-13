@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { UserCircle, Plus, Mail, Phone, Shield, MoreVertical, ShieldCheck, ShieldAlert } from 'lucide-react';
+import { UserCircle, Plus, Mail, Phone, Shield, MoreVertical, ShieldCheck, ShieldAlert, DollarSign, Calendar, Loader2 } from 'lucide-react';
 import api from '../services/api';
 
 export default function EmployeeManagement() {
   const [employees, setEmployees] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'employee', salary: '', joinDate: new Date().toISOString().split('T')[0] });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -28,12 +28,20 @@ export default function EmployeeManagement() {
     try {
       await api.post('/api/employees', formData);
       setIsModalOpen(false);
-      setFormData({ name: '', email: '', password: '' });
+      setFormData({ name: '', email: '', password: '', role: 'employee', salary: '', joinDate: new Date().toISOString().split('T')[0] });
       fetchEmployees();
     } catch (error) {
       alert('Failed to add employee');
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -74,7 +82,13 @@ export default function EmployeeManagement() {
                 <Mail className="w-4 h-4" /> {emp.email}
               </div>
               <div className="flex items-center gap-3 text-sm text-slate-500 dark:text-slate-400">
-                <Shield className="w-4 h-4" /> Role: {emp.role}
+                <Shield className="w-4 h-4" /> Role: <span className="capitalize">{emp.role}</span>
+              </div>
+              <div className="flex items-center gap-3 text-sm text-slate-500 dark:text-slate-400">
+                <DollarSign className="w-4 h-4" /> Salary: ₹{parseFloat(emp.salary).toLocaleString()}
+              </div>
+              <div className="flex items-center gap-3 text-sm text-slate-500 dark:text-slate-400 font-medium">
+                <Calendar className="w-4 h-4" /> Joined: {new Date(emp.joinDate).toLocaleDateString()}
               </div>
             </div>
 
@@ -122,6 +136,40 @@ export default function EmployeeManagement() {
                   className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl dark:text-white"
                   value={formData.password}
                   onChange={e => setFormData({...formData, password: e.target.value})}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-500 uppercase">Role</label>
+                  <select 
+                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl dark:text-white"
+                    value={formData.role}
+                    onChange={e => setFormData({...formData, role: e.target.value})}
+                  >
+                    <option value="sales">Sales</option>
+                    <option value="manager">Manager</option>
+                    <option value="helper">Helper</option>
+                    <option value="employee">Other</option>
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-500 uppercase">Base Salary</label>
+                  <input 
+                    type="number"
+                    placeholder="Leave blank for default"
+                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl dark:text-white"
+                    value={formData.salary}
+                    onChange={e => setFormData({...formData, salary: e.target.value})}
+                  />
+                </div>
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-500 uppercase">Join Date</label>
+                <input 
+                  type="date"
+                  className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl dark:text-white"
+                  value={formData.joinDate}
+                  onChange={e => setFormData({...formData, joinDate: e.target.value})}
                 />
               </div>
               <div className="flex gap-4 pt-4">

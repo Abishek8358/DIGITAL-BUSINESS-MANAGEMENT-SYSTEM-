@@ -26,37 +26,6 @@ const authenticateToken = (req: any, res: any, next: any) => {
   });
 };
 
-// Seed Admin directly through pool (async IIFE)
-(async () => {
-  try {
-    const res = await pool.query("SELECT * FROM users WHERE role = 'admin'");
-    if (res.rows.length === 0) {
-      const hash = bcrypt.hashSync('admin123', 10);
-      await pool.query(
-        'INSERT INTO users (email, password, role, name, status) VALUES ($1, $2, $3, $4, $5)',
-        ['admin@corebiz.com', hash, 'admin', 'System Admin', 'active']
-      );
-    }
-
-    // Seed Employee
-    const empRes = await pool.query("SELECT * FROM users WHERE role = 'employee' LIMIT 1");
-    if (empRes.rows.length > 0) {
-      const existingEmployee = empRes.rows[0];
-      console.log(`Employee login detected: ${existingEmployee.email}`);
-    } else {
-      const empHash = bcrypt.hashSync('employee123', 10);
-      await pool.query(
-        'INSERT INTO users (name, email, password, role, status) VALUES ($1, $2, $3, $4, $5)',
-        ['Default Employee', 'employee@corebiz.com', empHash, 'employee', 'active']
-      );
-      console.log(`Default employee created\nEmail: employee@corebiz.com\nPassword: employee123`);
-    }
-
-  } catch (err) {
-    console.error('Failed to seed users:', err);
-  }
-})();
-
 // --- API Routes ---
 
 // Register
@@ -251,7 +220,13 @@ app.delete('/api/products/:id', authenticateToken, async (req: any, res) => {
 // Customers
 app.get('/api/customers', authenticateToken, async (req: any, res) => {
   try {
-    const result = await pool.query('SELECT id, name, mobile, totalpurchases as "totalPurchases", lastpurchasedate as "lastPurchaseDate" FROM customers WHERE store_id = $1', [req.user.store_id]);
+    // Return unique customers per store based on phone
+    const result = await pool.query(`
+      SELECT DISTINCT ON (phone) id, name, phone as "mobile", total_spent as "totalPurchases", last_visit as "lastPurchaseDate" 
+      FROM customers 
+      WHERE store_id = $1 
+      ORDER BY phone, last_visit DESC
+    `, [req.user.store_id]);
     res.json(result.rows);
   } catch(err: any) {
     res.status(500).json({ error: err.message });
@@ -259,33 +234,52 @@ app.get('/api/customers', authenticateToken, async (req: any, res) => {
 });
 
 app.post('/api/customers', authenticateToken, async (req: any, res) => {
-  const { name, mobile } = req.body;
+  const { name, phone } = req.body;
   try {
-    const result = await pool.query('INSERT INTO customers (name, mobile, store_id) VALUES ($1, $2, $3) RETURNING id', [name, mobile, req.user.store_id]);
+    const result = await pool.query(
+      'INSERT INTO customers (name, phone, store_id) VALUES ($1, $2, $3) ON CONFLICT (phone, store_id) DO UPDATE SET name = EXCLUDED.name RETURNING id', 
+      [name, phone, req.user.store_id]
+    );
     res.json({ id: result.rows[0].id });
-  } catch (e: any) {
-    try {
-      const existing = await pool.query('SELECT id, name, mobile, totalpurchases as "totalPurchases", lastpurchasedate as "lastPurchaseDate" FROM customers WHERE mobile = $1 AND store_id = $2', [mobile, req.user.store_id]);
-      res.json(existing.rows[0]);
-    } catch(err: any) {
-      res.status(500).json({ error: err.message });
-    }
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
   }
 });
 
 // Sales & Billing
 app.post('/api/sales', authenticateToken, async (req: any, res) => {
-  const { customerId, items, subtotal, gstTotal, grandTotal } = req.body;
+  const { customerId: providedId, customerName, customerPhone, items, subtotal, gstTotal, grandTotal } = req.body;
   const invoiceId = 'INV-' + Date.now();
   const date = new Date().toISOString();
 
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
+
+    let finalCustomerId = providedId;
+
+    // Task 1: Customer Upsert Logic
+    if (customerPhone) {
+      const existingCust = await client.query('SELECT id FROM customers WHERE phone = $1 AND store_id = $2', [customerPhone, req.user.store_id]);
+      if (existingCust.rows.length > 0) {
+        finalCustomerId = existingCust.rows[0].id;
+        await client.query(
+          'UPDATE customers SET total_spent = total_spent + $1, last_visit = CURRENT_TIMESTAMP, name = $2 WHERE id = $3 AND store_id = $4', 
+          [grandTotal, customerName, finalCustomerId, req.user.store_id]
+        );
+      } else {
+        const newCust = await client.query(
+          'INSERT INTO customers (name, phone, total_spent, last_visit, store_id) VALUES ($1, $2, $3, CURRENT_TIMESTAMP, $4) RETURNING id',
+          [customerName || 'Walking Customer', customerPhone, grandTotal, req.user.store_id]
+        );
+        finalCustomerId = newCust.rows[0].id;
+      }
+    }
+
     const saleResult = await client.query(`
       INSERT INTO sales (invoiceid, customerid, subtotal, gsttotal, grandtotal, date, createdby, store_id)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id
-    `, [invoiceId, customerId, subtotal, gstTotal, grandTotal, date, req.user.id, req.user.store_id]);
+    `, [invoiceId, finalCustomerId, subtotal, gstTotal, grandTotal, date, req.user.id, req.user.store_id]);
 
     const saleId = saleResult.rows[0].id;
 
@@ -296,10 +290,6 @@ app.post('/api/sales', authenticateToken, async (req: any, res) => {
       `, [saleId, item.id, item.quantity, item.sellingPrice, (item.sellingPrice * item.gstPercent / 100) * item.quantity, item.total]);
 
       await client.query('UPDATE products SET stock = stock - $1 WHERE id = $2 AND store_id = $3', [item.quantity, item.id, req.user.store_id]);
-    }
-
-    if (customerId) {
-      await client.query('UPDATE customers SET totalpurchases = totalpurchases + $1, lastpurchasedate = $2 WHERE id = $3 AND store_id = $4', [grandTotal, date, customerId, req.user.store_id]);
     }
 
     await client.query('COMMIT');
@@ -316,7 +306,7 @@ app.get('/api/sales/:id', authenticateToken, async (req: any, res) => {
   try {
     const saleResult = await pool.query(`
       SELECT s.id, s.invoiceid as "invoiceId", s.customerid as "customerId", s.subtotal, s.gsttotal as "gstTotal", s.grandtotal as "grandTotal", s.date, s.createdby as "createdBy", 
-             c.name as "customerName", c.mobile as "customerMobile"
+             c.name as "customerName", c.phone as "customerMobile"
       FROM sales s
       LEFT JOIN customers c ON s.customerid = c.id
       WHERE s.id = $1 AND s.store_id = $2
@@ -342,12 +332,23 @@ app.get('/api/sales/:id', authenticateToken, async (req: any, res) => {
 // Dashboard Stats
 app.get('/api/dashboard/stats', authenticateToken, async (req: any, res) => {
   try {
-    const [productsRes, salesRes, customersRes, revenueRes, lowStockRes, recentSalesRes] = await Promise.all([
+    const [productsRes, salesRes, customersRes, revenueRes, lowStockRes, recentSalesRes, profitRes] = await Promise.all([
       pool.query('SELECT COUNT(*) as count FROM products WHERE store_id = $1', [req.user.store_id]),
       pool.query('SELECT COUNT(*) as count FROM sales WHERE store_id = $1', [req.user.store_id]),
       pool.query('SELECT COUNT(*) as count FROM customers WHERE store_id = $1', [req.user.store_id]),
-      pool.query("SELECT SUM(grandtotal) as total FROM sales WHERE date >= date_trunc('month', CURRENT_DATE) AND store_id = $1", [req.user.store_id]),
-      pool.query('SELECT id, name, categoryid as "categoryId", brand, costprice as "costPrice", sellingprice as "sellingPrice", gstpercent as "gstPercent", stock, minimumstock as "minimumStock", reorderquantity as "reorderQuantity", imageurl as "imageUrl", description FROM products WHERE stock < 5 AND store_id = $1', [req.user.store_id]),
+      pool.query(`
+        SELECT to_char(month, 'Mon') as month, COALESCE(SUM(s.grandtotal), 0) as revenue
+        FROM generate_series(date_trunc('year', CURRENT_DATE), date_trunc('year', CURRENT_DATE) + interval '11 months', interval '1 month') AS month
+        LEFT JOIN sales s ON date_trunc('month', s.date) = month AND s.store_id = $1
+        GROUP BY month
+        ORDER BY month
+      `, [req.user.store_id]),
+      pool.query(`
+        SELECT p.id, p.name, p.categoryid as "categoryId", p.brand, p.costprice as "costPrice", p.sellingprice as "sellingPrice", p.gstpercent as "gstPercent", p.stock, p.minimumstock as "minimumStock", p.reorderquantity as "reorderQuantity", p.imageurl as "imageUrl", p.description 
+        FROM products p
+        JOIN store_settings s ON p.store_id = s.store_id
+        WHERE p.stock < s.low_stock_threshold AND p.store_id = $1
+      `, [req.user.store_id]),
       pool.query(`
         SELECT s.id, s.invoiceid as "invoiceId", s.customerid as "customerId", s.subtotal, s.gsttotal as "gstTotal", s.grandtotal as "grandTotal", s.date, s.createdby as "createdBy", 
                c.name as "customerName" 
@@ -355,6 +356,12 @@ app.get('/api/dashboard/stats', authenticateToken, async (req: any, res) => {
         LEFT JOIN customers c ON s.customerid = c.id 
         WHERE s.store_id = $1
         ORDER BY s.date DESC LIMIT 5
+      `, [req.user.store_id]),
+      pool.query(`
+        SELECT COALESCE(SUM(si.quantity * (si.unitprice - p.costprice)), 0) AS "totalProfit"
+        FROM sale_items si
+        JOIN products p ON si.productid = p.id
+        WHERE p.store_id = $1
       `, [req.user.store_id])
     ]);
 
@@ -364,7 +371,9 @@ app.get('/api/dashboard/stats', authenticateToken, async (req: any, res) => {
       totalCustomers: parseInt(customersRes.rows[0].count, 10),
       monthlyRevenue: parseFloat(revenueRes.rows[0].total) || 0,
       lowStock: lowStockRes.rows,
-      recentSales: recentSalesRes.rows
+      recentSales: recentSalesRes.rows,
+      revenueHistory: revenueRes.rows,
+      totalProfit: parseFloat(profitRes.rows[0].totalProfit) || 0
     });
   } catch(err: any) {
     res.status(500).json({ error: err.message });
@@ -372,17 +381,85 @@ app.get('/api/dashboard/stats', authenticateToken, async (req: any, res) => {
 });
 
 // Reports
-app.get('/api/reports/sales-trend', authenticateToken, async (req: any, res) => {
+app.get('/api/reports/summary', authenticateToken, async (req: any, res) => {
   try {
-    const trend = await pool.query(`
-      SELECT to_char(date, 'YYYY-MM-DD') as day, SUM(grandtotal) as revenue
-      FROM sales
+    const summaryRes = await pool.query(`
+      SELECT 
+        COALESCE(SUM(grandtotal), 0) as "total_revenue",
+        COUNT(*) as "total_orders",
+        COALESCE(AVG(grandtotal), 0) as "average_order_value",
+        COALESCE(SUM(gsttotal), 0) as "gst_collected"
+      FROM sales 
       WHERE store_id = $1
-      GROUP BY to_char(date, 'YYYY-MM-DD')
-      ORDER BY day ASC
-      LIMIT 30
     `, [req.user.store_id]);
-    res.json(trend.rows);
+
+    const profitRes = await pool.query(`
+      SELECT 
+        COALESCE(SUM(si.quantity * (si.unitprice - p.costprice)), 0) AS total_profit
+      FROM sale_items si
+      JOIN products p ON si.productid = p.id
+      WHERE p.store_id = $1
+    `, [req.user.store_id]);
+
+    res.json({
+      ...summaryRes.rows[0],
+      total_profit: profitRes.rows[0].total_profit
+    });
+  } catch(err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/reports/yearly-revenue', authenticateToken, async (req: any, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        to_char(month, 'Mon') as month, 
+        COALESCE(SUM(s.grandtotal), 0) as revenue
+      FROM generate_series(date_trunc('year', CURRENT_DATE), date_trunc('year', CURRENT_DATE) + interval '11 months', interval '1 month') AS month
+      LEFT JOIN sales s ON date_trunc('month', s.date) = month AND s.store_id = $1
+      GROUP BY month
+      ORDER BY month
+    `, [req.user.store_id]);
+    res.json(result.rows);
+  } catch(err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/reports/category-distribution', authenticateToken, async (req: any, res) => {
+  try {
+    const distribution = await pool.query(`
+      SELECT 
+        c.name, 
+        SUM(si.quantity * si.unitprice) AS revenue
+      FROM sale_items si
+      JOIN products p ON si.productid = p.id
+      JOIN categories c ON p.categoryid = c.id
+      WHERE p.store_id = $1
+      GROUP BY c.name
+      ORDER BY revenue DESC
+    `, [req.user.store_id]);
+    res.json(distribution.rows);
+  } catch(err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/reports/top-products', authenticateToken, async (req: any, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        p.name, 
+        SUM(si.quantity) AS total_sold
+      FROM sale_items si
+      JOIN products p ON si.productid = p.id
+      WHERE p.store_id = $1
+      GROUP BY p.name
+      ORDER BY total_sold DESC
+      LIMIT 5
+    `, [req.user.store_id]);
+    res.json(result.rows);
   } catch(err: any) {
     res.status(500).json({ error: err.message });
   }
@@ -392,7 +469,7 @@ app.get('/api/reports/sales-trend', authenticateToken, async (req: any, res) => 
 app.get('/api/employees', authenticateToken, async (req: any, res) => {
   if (req.user.role === 'employee') return res.sendStatus(403);
   try {
-    const employees = await pool.query("SELECT id, email, role, name, status, created_at FROM users WHERE role = 'employee' AND store_id = $1", [req.user.store_id]);
+    const employees = await pool.query("SELECT id, email, role, name, status, salary, join_date as \"joinDate\", created_at FROM users WHERE role = 'employee' AND store_id = $1", [req.user.store_id]);
     res.json(employees.rows);
   } catch(err: any) {
     res.status(500).json({ error: err.message });
@@ -401,13 +478,30 @@ app.get('/api/employees', authenticateToken, async (req: any, res) => {
 
 app.post('/api/employees', authenticateToken, async (req: any, res) => {
   if (req.user.role === 'employee') return res.sendStatus(403);
-  const { email, password, name } = req.body;
+  const { email, password, name, role = 'employee', salary, joinDate } = req.body;
   const hash = bcrypt.hashSync(password, 10);
+  
   try {
-    await pool.query('INSERT INTO users (email, password, role, name, status, store_id) VALUES ($1, $2, $3, $4, $5, $6)', [email, hash, 'employee', name, 'active', req.user.store_id]);
+    let finalSalary = salary;
+    if (!finalSalary) {
+      // Get defaults from settings
+      const settingsRes = await pool.query('SELECT default_sales_salary, default_manager_salary, default_helper_salary FROM store_settings WHERE store_id = $1', [req.user.store_id]);
+      const settings = settingsRes.rows[0];
+      if (settings) {
+        if (role === 'sales') finalSalary = settings.default_sales_salary;
+        else if (role === 'manager') finalSalary = settings.default_manager_salary;
+        else finalSalary = settings.default_helper_salary;
+      }
+    }
+
+    await pool.query(
+      'INSERT INTO users (email, password, role, name, status, store_id, salary, join_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)', 
+      [email, hash, role, name, 'active', req.user.store_id, finalSalary || 0, joinDate || new Date()]
+    );
     res.json({ success: true });
   } catch (e: any) {
-    res.status(400).json({ message: 'Email already exists' });
+    console.error('Create Employee Error:', e);
+    res.status(400).json({ message: 'Email already exists or invalid data' });
   }
 });
 
@@ -474,6 +568,30 @@ app.put('/api/settings/inventory', authenticateToken, async (req: any, res) => {
         low_stock_threshold = $1, critical_stock_threshold = $2, enable_stock_notifications = $3
       WHERE store_id = $4
     `, [lowStockThreshold, criticalStockThreshold, enableNotifications, req.user.store_id]);
+    res.json({ success: true });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/settings/employee-salary', authenticateToken, async (req: any, res) => {
+  try {
+    const result = await pool.query('SELECT default_sales_salary as "defaultSalesSalary", default_manager_salary as "defaultManagerSalary", default_helper_salary as "defaultHelperSalary" FROM store_settings WHERE store_id = $1', [req.user.store_id]);
+    res.json(result.rows[0] || { defaultSalesSalary: 0, defaultManagerSalary: 0, defaultHelperSalary: 0 });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put('/api/settings/employee-salary', authenticateToken, async (req: any, res) => {
+  if (req.user.role !== 'admin') return res.sendStatus(403);
+  const { defaultSalesSalary, defaultManagerSalary, defaultHelperSalary } = req.body;
+  try {
+    await pool.query(`
+      UPDATE store_settings SET 
+        default_sales_salary = $1, default_manager_salary = $2, default_helper_salary = $3
+      WHERE store_id = $4
+    `, [defaultSalesSalary, defaultManagerSalary, defaultHelperSalary, req.user.store_id]);
     res.json({ success: true });
   } catch (err: any) {
     res.status(500).json({ error: err.message });

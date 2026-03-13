@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Search, Phone, Calendar, ShoppingBag, ExternalLink } from 'lucide-react';
+import { Users, Search, Phone, Calendar, ShoppingBag, ExternalLink, Loader2 } from 'lucide-react';
 import api from '../services/api';
 
 export default function CustomerManagement() {
@@ -26,6 +26,14 @@ export default function CustomerManagement() {
     c.name.toLowerCase().includes(search.toLowerCase()) || 
     c.mobile.includes(search)
   );
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

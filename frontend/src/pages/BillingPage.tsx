@@ -73,16 +73,10 @@ export default function BillingPage() {
     if (cart.length === 0) return;
     setIsProcessing(true);
     try {
-      // 1. Create/Get Customer
-      let customerId = null;
-      if (customer.mobile) {
-        const custRes = await api.post('/api/customers', customer);
-        customerId = custRes.data.id;
-      }
-
-      // 2. Create Sale
+      // Create Sale with Customer Upsert logic handled by backend
       const saleRes = await api.post('/api/sales', {
-        customerId,
+        customerName: customer.name,
+        customerPhone: customer.mobile,
         items: cart,
         subtotal,
         gstTotal,
