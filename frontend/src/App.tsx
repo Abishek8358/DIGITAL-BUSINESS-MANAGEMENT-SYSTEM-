@@ -12,13 +12,19 @@ import CategoryManagement from './pages/CategoryManagement';
 import CustomerManagement from './pages/CustomerManagement';
 import EmployeeManagement from './pages/EmployeeManagement';
 import ReportsPage from './pages/ReportsPage';
+import RegisterPage from './pages/RegisterPage';
+import SettingsPage from './pages/SettingsPage';
 
 function ProtectedRoute({ children, role }: { children: React.ReactNode, role?: string }) {
   const { user, loading } = useAuth();
   
   if (loading) return null;
   if (!user) return <Navigate to="/login" />;
-  if (role && user.role !== role) return <Navigate to={user.role === 'admin' ? '/admin/dashboard' : '/billing'} />;
+  
+  // 'admin' role now covers store owners
+  const isAuthorized = !role || user.role === role;
+  
+  if (!isAuthorized) return <Navigate to={user.role === 'employee' ? '/billing' : '/admin/dashboard'} />;
   
   return <>{children}</>;
 }
@@ -28,6 +34,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
       <Route path="/setup" element={<ProtectedRoute role="admin"><SetupWizard /></ProtectedRoute>} />
       
       <Route path="/admin" element={<ProtectedRoute role="admin"><DashboardLayout /></ProtectedRoute>}>
@@ -37,7 +44,7 @@ export default function App() {
         <Route path="customers" element={<CustomerManagement />} />
         <Route path="employees" element={<EmployeeManagement />} />
         <Route path="reports" element={<ReportsPage />} />
-        <Route path="settings" element={<div className="p-8 text-center text-slate-500">Settings coming soon...</div>} />
+        <Route path="settings" element={<SettingsPage />} />
       </Route>
 
       <Route path="/billing" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>

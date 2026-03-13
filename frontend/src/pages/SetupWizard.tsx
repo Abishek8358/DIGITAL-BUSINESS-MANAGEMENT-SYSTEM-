@@ -84,9 +84,10 @@ export default function SetupWizard() {
       }
 
       navigate('/admin/dashboard');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Setup failed', error);
-      alert('Setup failed. Please try again.');
+      const msg = error.response?.data?.error || 'Setup failed. Please check your inventory details.';
+      alert(msg);
     } finally {
       setLoading(false);
     }

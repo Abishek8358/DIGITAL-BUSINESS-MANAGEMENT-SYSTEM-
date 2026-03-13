@@ -38,14 +38,23 @@ export default function LandingPage() {
           </div>
           
           <div className="hidden md:flex items-center gap-8">
+            <a href="/" className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-indigo-600 transition-colors">Home</a>
             <a href="#features" className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-indigo-600 transition-colors">Features</a>
             <a href="#about" className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-indigo-600 transition-colors">About</a>
-            <button 
-              onClick={() => navigate('/login')}
-              className="bg-indigo-600 text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 dark:shadow-none"
-            >
-              Login
-            </button>
+            <div className="flex items-center gap-4 border-l border-slate-200 dark:border-slate-800 pl-8">
+              <button 
+                onClick={() => navigate('/login')}
+                className="text-sm font-bold text-slate-700 dark:text-slate-300 hover:text-indigo-600 transition-colors"
+              >
+                Login
+              </button>
+              <button 
+                onClick={() => navigate('/register')}
+                className="bg-indigo-600 text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 dark:shadow-none"
+              >
+                Register
+              </button>
+            </div>
           </div>
         </div>
       </nav>
@@ -65,13 +74,16 @@ export default function LandingPage() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <button 
-              onClick={() => navigate('/login')}
+              onClick={() => navigate('/register')}
               className="w-full sm:w-auto bg-indigo-600 text-white px-8 py-4 rounded-2xl text-lg font-bold hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-200 dark:shadow-none flex items-center justify-center gap-2"
             >
-              Get Started Now <ArrowRight className="w-5 h-5" />
+              Get Started <ArrowRight className="w-5 h-5" />
             </button>
-            <button className="w-full sm:w-auto bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-800 px-8 py-4 rounded-2xl text-lg font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
-              Watch Demo
+            <button 
+              onClick={() => navigate('/login')}
+              className="w-full sm:w-auto bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-800 px-8 py-4 rounded-2xl text-lg font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+            >
+              Login
             </button>
           </div>
 

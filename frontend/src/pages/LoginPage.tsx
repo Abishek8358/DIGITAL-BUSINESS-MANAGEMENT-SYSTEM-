@@ -122,10 +122,20 @@ export default function LoginPage() {
             )}
           </button>
 
-          <div className="pt-4 text-center">
+          <div className="pt-4 text-center space-y-4">
             <p className="text-xs text-slate-500 dark:text-slate-400">
               Default Admin: admin@corebiz.com / admin123
             </p>
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">Don't have a store yet?</p>
+              <button
+                type="button"
+                onClick={() => navigate('/register')}
+                className="text-indigo-600 font-bold hover:underline"
+              >
+                Create Your Store
+              </button>
+            </div>
           </div>
         </form>
       </div>
