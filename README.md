@@ -14,12 +14,12 @@ The project is built on a clean three-tier architecture:
 - `/database`: Database schema files
 
 ## Features
-- **Dynamic Setup**: Configure categories specific to your business (Grocery, Electronics, etc.)
-- **Role-Based Access**: Separate dashboards for Admins and Employees.
-- **Inventory Management**: Real-time stock tracking with low-stock alerts.
-- **POS / Billing**: Fast checkout with automated invoice generation and PDF download.
-- **Analytics**: Revenue trends and category distribution charts.
-- **Dark Mode**: Full system-wide theme support.
+- **Hierarchy-Based Stock Control**: Category → Product → Brand → Variant level tracking with separate pricing.
+- **SMS Billing**: Integrated Fast2SMS for automated customer purchase receipts.
+- **Complaint System**: Internal employee-to-admin feedback system with status tracking.
+- **POS / Billing**: Fast checkout with automated invoice generation, PDF download, and SMS confirmation.
+- **Analytics**: Revenue trends, category distribution, and top product charts.
+- **Dark Mode**: Full system-wide glassmorphism aesthetic support.
 
 ## Getting Started
 
@@ -51,9 +51,13 @@ The project is built on a clean three-tier architecture:
 ### Default Credentials
 - **Admin**: `admin@corebiz.com` / `admin123`
 
-## Database Seeding
-The application automatically seeds initial products, categories, and customers on the first run if the database is empty.
+## Database Reset & Seeding
+You can reset the entire database (transactional data) and re-initialize with default demo users using:
+```bash
+cd backend
+npm run reset:db
+```
 
 ## Role Permissions
-- **Admin**: Full access to Dashboard, Products, Categories, Customers, Employees, Reports, and Settings.
-- **Employee**: Access limited to Billing/POS and Invoice viewing.
+- **Admin**: Full access to Dashboard, Products (Add/Edit/Delete/Stock), Categories, Customers, Employees, Complaints (Resolve), Reports, and Settings.
+- **Employee**: Access limited to Billing/POS, View Products, and Raise Complaint (Support). Restricted from modifying stock or seeing cost prices.

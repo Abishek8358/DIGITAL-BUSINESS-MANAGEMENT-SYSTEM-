@@ -1,0 +1,5 @@
+Sample variant: {"variantId":3,"variant_name":"Tuf Gaming","sellingPrice":"100000.00","gstPercent":"4.00","stock":12,"brandId":3,"brandName":"Asus","productId":2,"productName":"Laptop","categoryId":1}
+
+Sale inserted: id=11
+Sale item inserted OK
+Rolled back (test only)

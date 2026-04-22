@@ -1,20 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Store, 
-  CreditCard, 
-  Box, 
-  Palette, 
-  Lock, 
-  Save, 
-  Upload, 
-  CheckCircle2, 
+import {
+  Store,
+  CreditCard,
+  Box,
+  Lock,
+  Save,
+  Upload,
+  CheckCircle2,
   AlertCircle,
   Loader2,
-  DollarSign
+  DollarSign,
+  Zap,
+  Cpu,
+  Fingerprint,
+  Globe,
+  Activity,
+  ChevronRight,
+  ShieldCheck,
+  ShieldAlert,
+  AlertTriangle,
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  FileText
 } from 'lucide-react';
 import api from '../services/api';
 
-type Section = 'profile' | 'billing' | 'inventory' | 'salary' | 'appearance' | 'security';
+const API_BASE = 'http://localhost:5000';
+function resolveLogoUrl(url?: string): string {
+  if (!url) return '';
+  if (url.startsWith('/uploads/')) return `${API_BASE}${url}`;
+  return url;
+}
+
+type Section = 'profile' | 'billing' | 'inventory' | 'security';
 
 export default function SettingsPage() {
   const [activeSection, setActiveSection] = useState<Section>('profile');
@@ -42,10 +62,6 @@ export default function SettingsPage() {
     currentPassword: '', newPassword: '', confirmPassword: ''
   });
 
-  const [appearance, setAppearance] = useState(() => {
-    return localStorage.getItem('theme') || 'system';
-  });
-
   useEffect(() => {
     fetchData();
   }, []);
@@ -55,15 +71,15 @@ export default function SettingsPage() {
     try {
       const [storeRes, settingsRes, salaryRes] = await Promise.all([
         api.get('/api/store'),
-        api.get('/api/settings/all'), // This returns all store settings
+        api.get('/api/settings/all'),
         api.get('/api/settings/employee-salary')
       ]);
-      
+
       setStoreData(storeRes.data);
       if (salaryRes.data) {
         setSalaryData(salaryRes.data);
       }
-      if (settingsRes.data.id) {
+      if (settingsRes.data && settingsRes.data.id) {
         setBillingData({
           currency: settingsRes.data.currency,
           defaultGst: settingsRes.data.default_gst,
@@ -93,9 +109,9 @@ export default function SettingsPage() {
     setLoading(true);
     try {
       await api.put('/api/store/update', storeData);
-      showToast('Store profile updated successfully');
+      showToast('Store Profile Updated');
     } catch (err: any) {
-      showToast(err.response?.data?.error || 'Failed to update profile', 'error');
+      showToast(err.response?.data?.error || 'Update Failed', 'error');
     } finally {
       setLoading(false);
     }
@@ -106,7 +122,7 @@ export default function SettingsPage() {
     setLoading(true);
     try {
       await api.put('/api/settings/billing', billingData);
-      showToast('Billing settings saved');
+      showToast('Billing Settings Saved');
     } catch (err: any) {
       showToast('Failed to save billing settings', 'error');
     } finally {
@@ -119,25 +135,27 @@ export default function SettingsPage() {
     setLoading(true);
     try {
       await api.put('/api/settings/inventory', inventoryData);
-      showToast('Inventory thresholds updated');
+      showToast('Inventory Settings Saved');
     } catch (err: any) {
-      showToast('Failed to update inventory settings', 'error');
+      showToast('Failed to save inventory settings', 'error');
     } finally {
       setLoading(false);
     }
   };
+
   const handleUpdateSalary = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
       await api.put('/api/settings/employee-salary', salaryData);
-      showToast('Salary defaults saved');
+      showToast('Salary Rules Saved');
     } catch (err: any) {
-      showToast('Failed to save salary settings', 'error');
+      showToast('Failed to save salary rules', 'error');
     } finally {
       setLoading(false);
     }
   };
+
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (securityData.newPassword !== securityData.confirmPassword) {
@@ -149,225 +167,212 @@ export default function SettingsPage() {
         currentPassword: securityData.currentPassword,
         newPassword: securityData.newPassword
       });
-      showToast('Password changed successfully');
+      showToast('Password Changed Successfully');
       setSecurityData({ currentPassword: '', newPassword: '', confirmPassword: '' });
     } catch (err: any) {
-      showToast(err.response?.data?.message || 'Failed to change password', 'error');
+      showToast(err.response?.data?.message || 'Current password incorrect', 'error');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAppearanceChange = (mode: string) => {
-    setAppearance(mode);
-    localStorage.setItem('theme', mode);
-    if (mode === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else if (mode === 'light') {
-      document.documentElement.classList.remove('dark');
-    } else {
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    }
-    showToast(`Theme set to ${mode}`);
-  };
-
   const sections = [
-    { id: 'profile', name: 'Store Profile', icon: Store },
-    { id: 'billing', name: 'Billing & Tax', icon: CreditCard },
-    { id: 'inventory', name: 'Inventory Settings', icon: Box },
-    { id: 'salary', name: 'Salary Configuration', icon: DollarSign },
-    { id: 'appearance', name: 'Appearance', icon: Palette },
-    { id: 'security', name: 'Security', icon: Lock },
+    { id: 'profile', name: 'Store Profile', icon: Store, desc: 'Store identity & contact' },
+    { id: 'billing', name: 'Billing Settings', icon: CreditCard, desc: 'Invoice & Tax settings' },
+    { id: 'inventory', name: 'Inventory Settings', icon: Box, desc: 'Stock thresholds' },
+
+    { id: 'security', name: 'Security', icon: Lock, desc: 'Account security' },
   ];
 
-  if (fetching) {
-    return (
-      <div className="p-8 flex items-center justify-center min-h-[400px]">
-        <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
-      </div>
-    );
-  }
+  if (fetching) return (
+    <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
+      <div className="w-12 h-12 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin" />
+      <p className="text-sm font-semibold text-slate-500">Loading settings...</p>
+    </div>
+  );
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Settings</h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">Manage your store configuration and preferences.</p>
+    <div className="space-y-10 pb-20">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-200 dark:border-slate-800 pb-10">
+        <div className="space-y-1">
+          <h1 className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
+            Settings
+          </h1>
+          <p className="text-slate-500 font-medium">
+            Manage your store configuration and preferences
+          </p>
         </div>
-        
+
         {message.text && (
-          <div className={`flex items-center gap-2 px-4 py-2 rounded-lg border animate-in fade-in slide-in-from-top-4 duration-300 ${
-            message.type === 'success' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-red-50 border-red-100 text-red-600'
-          }`}>
-            {message.type === 'success' ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
-            <span className="text-sm font-medium">{message.text}</span>
+          <div className={`px-6 py-4 rounded-2xl border flex items-center gap-3 animate-in fade-in slide-in-from-right-10 duration-500 shadow-lg ${message.type === 'success' ? 'bg-emerald-50 dark:bg-emerald-950 border-emerald-100 dark:border-emerald-900 text-emerald-600 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-950 border-red-100 dark:border-red-900 text-red-600 dark:text-red-400'
+            }`}>
+            {message.type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
+            <span className="text-sm font-bold">{message.text}</span>
           </div>
         )}
       </div>
 
-      <div className="flex flex-col md:flex-row gap-8">
-        {/* Sidebar Tabs */}
-        <div className="w-full md:w-64 flex flex-col gap-1">
+      <div className="flex flex-col lg:flex-row gap-10">
+        {/* Sidebar Nav */}
+        <div className="w-full lg:w-80 flex flex-col gap-3">
           {sections.map((s) => (
             <button
               key={s.id}
               onClick={() => setActiveSection(s.id as Section)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
-                activeSection === s.id 
-                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-none' 
-                : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
-              }`}
+              className={`flex items-start gap-4 p-5 rounded-2xl transition-all duration-200 group relative border shadow-sm ${activeSection === s.id
+                  ? 'bg-indigo-600 border-indigo-600 text-white shadow-indigo-600/20'
+                  : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500'
+                }`}
             >
-              <s.icon className="w-5 h-5" />
-              {s.name}
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${activeSection === s.id ? 'bg-white/20 text-white' : 'bg-slate-50 dark:bg-slate-950 text-indigo-600 dark:text-indigo-400'
+                }`}>
+                <s.icon className="w-5 h-5" />
+              </div>
+              <div className="flex-1 text-left">
+                <p className={`text-sm font-bold ${activeSection === s.id ? 'text-white' : 'text-slate-900 dark:text-white'}`}>{s.name}</p>
+                <p className={`text-xs mt-0.5 ${activeSection === s.id ? 'text-indigo-100' : 'text-slate-500'}`}>{s.desc}</p>
+              </div>
+              {activeSection === s.id && <ChevronRight className="w-4 h-4 text-white mt-1.5" />}
             </button>
           ))}
         </div>
 
-        {/* Content Area */}
+        {/* Form Area */}
         <div className="flex-1">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-            
+          <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden min-h-[500px]">
+
             {activeSection === 'profile' && (
-              <form onSubmit={handleUpdateProfile} className="p-8 space-y-6">
-                <div className="flex items-center gap-6 mb-8">
-                  <div className="w-24 h-24 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-700 relative overflow-hidden group">
-                    {storeData.logoUrl ? (
-                      <img src={storeData.logoUrl} alt="Logo" className="w-full h-full object-cover" />
-                    ) : (
-                      <Store className="w-8 h-8 text-slate-400" />
-                    )}
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
-                      <Upload className="w-6 h-6 text-white" />
+              <form onSubmit={handleUpdateProfile} className="p-10 space-y-10 animate-in fade-in duration-300">
+                <div className="flex flex-col sm:flex-row items-center gap-8">
+                  <div className="relative group/logo">
+                    <div className="w-32 h-32 bg-slate-50 dark:bg-slate-950 rounded-[2rem] flex items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 group-hover/logo:border-indigo-500 transition-all overflow-hidden shadow-inner">
+                      {storeData.logoUrl ? (
+                        <img src={resolveLogoUrl(storeData.logoUrl)} alt="Store" className="w-full h-full object-contain p-4 group-hover/logo:scale-110 transition-transform duration-500" />
+                      ) : (
+                        <Store className="w-10 h-10 text-slate-300" />
+                      )}
+                      <label className="absolute inset-0 bg-indigo-600/80 opacity-0 group-hover/logo:opacity-100 transition-all flex items-center justify-center cursor-pointer">
+                        <Upload className="w-8 h-8 text-white" />
+                        <input type="file" className="hidden" accept="image/*" onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          const fd = new FormData();
+                          fd.append('logo', file);
+                          try {
+                            setLoading(true);
+                            const res = await api.put('/api/store/update', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+                            setStoreData(res.data);
+                            showToast('Logo Updated');
+                          } catch (e) { showToast('Upload failed', 'error'); }
+                          finally { setLoading(false); }
+                        }} />
+                      </label>
                     </div>
                   </div>
-                  <div>
-                    <h3 className="font-bold text-slate-900 dark:text-white">Store Logo</h3>
-                    <p className="text-xs text-slate-500 mt-1">Recommended size: 200x200px. JPG or PNG.</p>
-                    <input 
-                      type="text" 
-                      placeholder="Logo URL" 
-                      className="mt-2 text-xs w-full p-2 bg-slate-50 dark:bg-slate-800 border-none rounded-lg focus:ring-1 focus:ring-indigo-500 dark:text-white"
-                      value={storeData.logoUrl}
-                      onChange={e => setStoreData({...storeData, logoUrl: e.target.value})}
-                    />
+                  <div className="flex-1 space-y-4">
+                    <div>
+                      <h3 className="text-xl font-bold text-slate-900 dark:text-white">Store Logo</h3>
+                      <p className="text-sm text-slate-500 font-medium">Update your store logo for branding and invoices.</p>
+                    </div>
+                    <div className="relative">
+                      <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <input
+                        className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-indigo-500/10"
+                        placeholder="Or provide an image URL..."
+                        value={storeData.logoUrl || ''}
+                        onChange={e => setStoreData({ ...storeData, logoUrl: e.target.value })}
+                      />
+                    </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Store Name</label>
-                    <input 
-                      className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white"
-                      value={storeData.storeName}
-                      onChange={e => setStoreData({...storeData, storeName: e.target.value})}
-                    />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Store Name</label>
+                    <div className="relative">
+                      <Store className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <input className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold text-slate-900 dark:text-white outline-none"
+                        value={storeData.storeName} onChange={e => setStoreData({ ...storeData, storeName: e.target.value })} required />
+                    </div>
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Owner Name</label>
-                    <input 
-                      className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white"
-                      value={storeData.ownerName}
-                      onChange={e => setStoreData({...storeData, ownerName: e.target.value})}
-                    />
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Owner Name</label>
+                    <div className="relative">
+                      <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <input className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold text-slate-900 dark:text-white outline-none"
+                        value={storeData.ownerName} onChange={e => setStoreData({ ...storeData, ownerName: e.target.value })} required />
+                    </div>
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Contact Phone</label>
-                    <input 
-                      className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white"
-                      value={storeData.phone}
-                      onChange={e => setStoreData({...storeData, phone: e.target.value})}
-                    />
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Phone Number</label>
+                    <div className="relative">
+                      <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <input className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold text-slate-900 dark:text-white outline-none"
+                        value={storeData.phone} onChange={e => setStoreData({ ...storeData, phone: e.target.value })} required />
+                    </div>
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Store Email</label>
-                    <input 
-                      className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white"
-                      value={storeData.email}
-                      onChange={e => setStoreData({...storeData, email: e.target.value})}
-                    />
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Email Address</label>
+                    <div className="relative">
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <input className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold text-slate-900 dark:text-white outline-none"
+                        value={storeData.email} onChange={e => setStoreData({ ...storeData, email: e.target.value })} required />
+                    </div>
                   </div>
-                  <div className="md:col-span-2 space-y-1">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Store Address</label>
-                    <textarea 
-                      rows={3}
-                      className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white"
-                      value={storeData.address}
-                      onChange={e => setStoreData({...storeData, address: e.target.value})}
-                    />
+                  <div className="md:col-span-2 space-y-2">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Store Address</label>
+                    <div className="relative">
+                      <MapPin className="absolute left-4 top-4 w-4 h-4 text-slate-400" />
+                      <textarea rows={3} className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold text-slate-900 dark:text-white outline-none"
+                        value={storeData.address} onChange={e => setStoreData({ ...storeData, address: e.target.value })} required />
+                    </div>
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">GST Number</label>
-                    <input 
-                      className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white"
-                      value={storeData.gstNumber}
-                      onChange={e => setStoreData({...storeData, gstNumber: e.target.value})}
-                    />
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">GST Number</label>
+                    <div className="relative">
+                      <FileText className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <input className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold text-slate-900 dark:text-white outline-none placeholder:text-slate-500"
+                        placeholder="Optional"
+                        value={storeData.gstNumber} onChange={e => setStoreData({ ...storeData, gstNumber: e.target.value })} />
+                    </div>
                   </div>
                 </div>
 
-                <div className="pt-4">
-                  <button 
-                    disabled={loading}
-                    className="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2"
-                  >
-                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Save className="w-5 h-5" /> Save Changes</>}
+                <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
+                  <button type="submit" disabled={loading} className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-3 px-10 py-4 rounded-2xl text-sm font-bold uppercase tracking-wider shadow-lg shadow-indigo-600/20 transition-all active:scale-95 disabled:opacity-50">
+                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Save className="w-5 h-5" /> Save Profile</>}
                   </button>
                 </div>
               </form>
             )}
 
             {activeSection === 'billing' && (
-              <form onSubmit={handleUpdateBilling} className="p-8 space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Currency Symbol</label>
-                    <input 
-                      placeholder="e.g. ₹ or $"
-                      className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white"
-                      value={billingData.currency}
-                      onChange={e => setBillingData({...billingData, currency: e.target.value})}
-                    />
+              <form onSubmit={handleUpdateBilling} className="p-10 space-y-10 animate-in fade-in duration-300">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Currency Symbol</label>
+                    <input className="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-xl font-bold text-indigo-600 dark:text-indigo-400 outline-none"
+                      value={billingData.currency} onChange={e => setBillingData({ ...billingData, currency: e.target.value })} />
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Default GST %</label>
-                    <input 
-                      type="number"
-                      className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white"
-                      value={billingData.defaultGst}
-                      onChange={e => setBillingData({...billingData, defaultGst: parseFloat(e.target.value)})}
-                    />
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Default GST %</label>
+                    <input type="number" className="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-lg font-bold text-slate-900 dark:text-white outline-none"
+                      value={billingData.defaultGst} onChange={e => setBillingData({ ...billingData, defaultGst: parseFloat(e.target.value) })} />
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Invoice Prefix</label>
-                    <input 
-                      className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white"
-                      value={billingData.invoicePrefix}
-                      onChange={e => setBillingData({...billingData, invoicePrefix: e.target.value})}
-                    />
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Invoice Prefix</label>
+                    <input className="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold text-slate-900 dark:text-white outline-none"
+                      value={billingData.invoicePrefix} onChange={e => setBillingData({ ...billingData, invoicePrefix: e.target.value })} />
                   </div>
-                  <div className="md:col-span-2 space-y-1">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Invoice Footer Note</label>
-                    <textarea 
-                      rows={2}
-                      className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white"
-                      placeholder="Thank you for your business!"
-                      value={billingData.invoiceFooter}
-                      onChange={e => setBillingData({...billingData, invoiceFooter: e.target.value})}
-                    />
+                  <div className="md:col-span-2 space-y-2">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Invoice Footer</label>
+                    <textarea rows={3} className="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold text-slate-600 dark:text-slate-400 outline-none"
+                      value={billingData.invoiceFooter} onChange={e => setBillingData({ ...billingData, invoiceFooter: e.target.value })} />
                   </div>
                 </div>
-
-                <div className="pt-4">
-                  <button 
-                    disabled={loading}
-                    className="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2"
-                  >
+                <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
+                  <button disabled={loading} className="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-4 rounded-2xl text-sm font-bold uppercase tracking-wider shadow-lg shadow-indigo-600/20 transition-all active:scale-95">
                     {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Save className="w-5 h-5" /> Save Billing Settings</>}
                   </button>
                 </div>
@@ -375,159 +380,58 @@ export default function SettingsPage() {
             )}
 
             {activeSection === 'inventory' && (
-              <form onSubmit={handleUpdateInventory} className="p-8 space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Low Stock Threshold</label>
-                    <input 
-                      type="number"
-                      className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white"
-                      value={inventoryData.lowStockThreshold}
-                      onChange={e => setInventoryData({...inventoryData, lowStockThreshold: parseInt(e.target.value)})}
-                    />
+              <form onSubmit={handleUpdateInventory} className="p-10 space-y-10 animate-in fade-in duration-300">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="p-6 bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900 rounded-3xl space-y-4">
+                    <div className="flex items-center gap-3">
+                      <AlertTriangle className="w-5 h-5 text-amber-600" />
+                      <h4 className="text-sm font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider">Low Stock Level</h4>
+                    </div>
+                    <input type="number" className="w-full p-4 bg-white dark:bg-slate-950 border border-amber-200 dark:border-amber-800 rounded-2xl text-2xl font-bold text-amber-600 outline-none shadow-sm"
+                      value={inventoryData.lowStockThreshold} onChange={e => setInventoryData({ ...inventoryData, lowStockThreshold: parseInt(e.target.value) })} />
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Critical Stock Threshold</label>
-                    <input 
-                      type="number"
-                      className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white"
-                      value={inventoryData.criticalStockThreshold}
-                      onChange={e => setInventoryData({...inventoryData, criticalStockThreshold: parseInt(e.target.value)})}
-                    />
+                  <div className="p-6 bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900 rounded-3xl space-y-4">
+                    <div className="flex items-center gap-3">
+                      <ShieldAlert className="w-5 h-5 text-red-600" />
+                      <h4 className="text-sm font-bold text-red-700 dark:text-red-400 uppercase tracking-wider">Critical Stock Level</h4>
+                    </div>
+                    <input type="number" className="w-full p-4 bg-white dark:bg-slate-950 border border-red-200 dark:border-red-800 rounded-2xl text-2xl font-bold text-red-600 outline-none shadow-sm"
+                      value={inventoryData.criticalStockThreshold} onChange={e => setInventoryData({ ...inventoryData, criticalStockThreshold: parseInt(e.target.value) })} />
                   </div>
-                  <div className="md:col-span-2 flex items-center gap-3 py-4">
-                    <input 
-                      type="checkbox"
-                      id="notifications"
-                      className="w-5 h-5 text-indigo-600 rounded"
-                      checked={inventoryData.enableNotifications}
-                      onChange={e => setInventoryData({...inventoryData, enableNotifications: e.target.checked})}
-                    />
-                    <label htmlFor="notifications" className="text-sm font-medium text-slate-700 dark:text-slate-300">Enable Stock Notifications</label>
+                  <div className="md:col-span-2 flex items-center gap-4 p-6 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800">
+                    <input type="checkbox" id="notifications" className="w-6 h-6 rounded-lg border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                      checked={inventoryData.enableNotifications} onChange={e => setInventoryData({ ...inventoryData, enableNotifications: e.target.checked })} />
+                    <label htmlFor="notifications" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer">Enable Stock Notifications (Beta)</label>
                   </div>
                 </div>
-
-                <div className="pt-4">
-                  <button 
-                    disabled={loading}
-                    className="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2"
-                  >
-                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Save className="w-5 h-5" /> Save Inventory Rules</>}
+                <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
+                  <button disabled={loading} className="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-4 rounded-2xl text-sm font-bold uppercase tracking-wider shadow-lg shadow-indigo-600/20 transition-all active:scale-95">
+                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Save className="w-5 h-5" /> Save Inventory Settings</>}
                   </button>
                 </div>
               </form>
             )}
 
-            {activeSection === 'salary' && (
-              <form onSubmit={handleUpdateSalary} className="p-8 space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Sales Basic Salary</label>
-                    <input 
-                      type="number"
-                      className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white"
-                      value={salaryData.defaultSalesSalary}
-                      onChange={e => setSalaryData({...salaryData, defaultSalesSalary: parseFloat(e.target.value)})}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Manager Basic Salary</label>
-                    <input 
-                      type="number"
-                      className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white"
-                      value={salaryData.defaultManagerSalary}
-                      onChange={e => setSalaryData({...salaryData, defaultManagerSalary: parseFloat(e.target.value)})}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Helper Basic Salary</label>
-                    <input 
-                      type="number"
-                      className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white"
-                      value={salaryData.defaultHelperSalary}
-                      onChange={e => setSalaryData({...salaryData, defaultHelperSalary: parseFloat(e.target.value)})}
-                    />
-                  </div>
-                </div>
 
-                <div className="pt-4">
-                  <button 
-                    disabled={loading}
-                    className="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2"
-                  >
-                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Save className="w-5 h-5" /> Save Salary Rules</>}
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {activeSection === 'appearance' && (
-              <div className="p-8 space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {['light', 'dark', 'system'].map((mode) => (
-                    <button
-                      key={mode}
-                      onClick={() => handleAppearanceChange(mode)}
-                      className={`p-6 rounded-2xl border-2 flex flex-col items-center gap-4 transition-all ${
-                        appearance === mode 
-                        ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-900/20' 
-                        : 'border-slate-100 dark:border-slate-800 bg-transparent hover:border-slate-200 dark:hover:border-slate-700'
-                      }`}
-                    >
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                         mode === 'light' ? 'bg-white text-orange-500 shadow-sm' : mode === 'dark' ? 'bg-slate-950 text-indigo-400' : 'bg-slate-200 text-slate-600'
-                      }`}>
-                        {mode === 'light' ? <Palette className="w-6 h-6" /> : mode === 'dark' ? <Palette className="w-6 h-6" /> : <Palette className="w-6 h-6" />}
-                      </div>
-                      <span className="capitalize font-bold text-slate-900 dark:text-white">{mode} Mode</span>
-                    </button>
-                  ))}
-                </div>
-                <p className="text-xs text-slate-500 text-center">Changes are saved to your browser's local storage.</p>
-              </div>
-            )}
 
             {activeSection === 'security' && (
-              <form onSubmit={handleUpdatePassword} className="p-8 space-y-6">
-                <div className="space-y-4 max-w-md">
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Current Password</label>
-                    <input 
-                      type="password"
-                      required
-                      className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white"
-                      value={securityData.currentPassword}
-                      onChange={e => setSecurityData({...securityData, currentPassword: e.target.value})}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">New Password</label>
-                    <input 
-                      type="password"
-                      required
-                      className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white"
-                      value={securityData.newPassword}
-                      onChange={e => setSecurityData({...securityData, newPassword: e.target.value})}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Confirm New Password</label>
-                    <input 
-                      type="password"
-                      required
-                      className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white"
-                      value={securityData.confirmPassword}
-                      onChange={e => setSecurityData({...securityData, confirmPassword: e.target.value})}
-                    />
-                  </div>
+              <form onSubmit={handleUpdatePassword} className="p-10 space-y-10 animate-in fade-in duration-300">
+                <div className="space-y-6 max-w-sm">
+                  {[
+                    { l: 'Current Password', v: securityData.currentPassword, k: 'currentPassword' },
+                    { l: 'New Password', v: securityData.newPassword, k: 'newPassword' },
+                    { l: 'Confirm Password', v: securityData.confirmPassword, k: 'confirmPassword' },
+                  ].map((f) => (
+                    <div key={f.k} className="space-y-2">
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">{f.l}</label>
+                      <input type="password" required className="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold text-slate-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/5 transition-all"
+                        value={f.v} onChange={e => setSecurityData({ ...securityData, [f.k]: e.target.value })} />
+                    </div>
+                  ))}
                 </div>
-
-                <div className="pt-4">
-                  <button 
-                    disabled={loading}
-                    className="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2"
-                  >
-                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Lock className="w-5 h-5" /> Change Password</>}
+                <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
+                  <button disabled={loading} className="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-4 rounded-2xl text-sm font-bold uppercase tracking-wider shadow-lg shadow-indigo-600/20 transition-all active:scale-95">
+                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Lock className="w-5 h-5" /> Update Password</>}
                   </button>
                 </div>
               </form>
@@ -535,6 +439,10 @@ export default function SettingsPage() {
 
           </div>
         </div>
+      </div>
+
+      <div className="flex justify-center pt-8 opacity-30">
+        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">CoreBiz SaaS</span>
       </div>
     </div>
   );

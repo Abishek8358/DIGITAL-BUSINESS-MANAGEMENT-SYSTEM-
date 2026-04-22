@@ -60,6 +60,7 @@ CREATE TABLE customers (
   total_spent DECIMAL(12,2) DEFAULT 0,
   last_visit TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   store_id INT NOT NULL,
+  loyalty_points INT DEFAULT 0,
   UNIQUE(phone, store_id),
   FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE
 );
@@ -74,6 +75,8 @@ CREATE TABLE sales (
   date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   createdBy INT,
   store_id INT NOT NULL,
+  points_earned INT DEFAULT 0,
+  points_redeemed INT DEFAULT 0,
   FOREIGN KEY (customerId) REFERENCES customers(id) ON DELETE SET NULL,
   FOREIGN KEY (createdBy) REFERENCES users(id) ON DELETE SET NULL,
   FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE
@@ -83,12 +86,14 @@ CREATE TABLE sale_items (
   id SERIAL PRIMARY KEY,
   saleId INT NOT NULL,
   productId INT,
+  variant_id INT,
   quantity INT NOT NULL,
   unitPrice DECIMAL(12,2) NOT NULL,
   gstAmount DECIMAL(12,2) NOT NULL,
   total DECIMAL(12,2) NOT NULL,
   FOREIGN KEY (saleId) REFERENCES sales(id) ON DELETE CASCADE,
-  FOREIGN KEY (productId) REFERENCES products(id) ON DELETE SET NULL
+  FOREIGN KEY (productId) REFERENCES products(id) ON DELETE SET NULL,
+  FOREIGN KEY (variant_id) REFERENCES variants(id) ON DELETE SET NULL
 );
 
 CREATE TABLE store_settings (
@@ -106,4 +111,41 @@ CREATE TABLE store_settings (
   default_helper_salary DECIMAL(12,2) DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE
+);
+
+CREATE TABLE brands (
+  id SERIAL PRIMARY KEY,
+  product_id INT NOT NULL,
+  store_id INT NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  UNIQUE(product_id, name),
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+  FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE
+);
+
+CREATE TABLE variants (
+  id SERIAL PRIMARY KEY,
+  brand_id INT NOT NULL,
+  store_id INT NOT NULL,
+  variant_name VARCHAR(255) NOT NULL,
+  selling_price DECIMAL(12,2) DEFAULT 0,
+  cost_price DECIMAL(12,2) DEFAULT 0,
+  gst_percent DECIMAL(5,2) DEFAULT 0,
+  stock INT DEFAULT 0,
+  minimum_stock INT DEFAULT 5,
+  image_url TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (brand_id) REFERENCES brands(id) ON DELETE CASCADE,
+  FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE
+);
+
+CREATE TABLE complaints (
+  id SERIAL PRIMARY KEY,
+  store_id INT NOT NULL,
+  employee_id INT NOT NULL,
+  message TEXT NOT NULL,
+  status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'resolved')),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE,
+  FOREIGN KEY (employee_id) REFERENCES users(id) ON DELETE CASCADE
 );

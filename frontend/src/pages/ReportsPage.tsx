@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  BarChart, 
+  BarChart as ReBarChart, 
   Bar, 
   XAxis, 
   YAxis, 
   CartesianGrid, 
   Tooltip, 
-  ResponsiveContainer 
+  ResponsiveContainer,
+  Cell
 } from 'recharts';
-import { Download, Filter, Calendar, TrendingUp, DollarSign, PieChart as PieIcon, Package, ShoppingBag, BarChart3, Loader2 } from 'lucide-react';
+import { Download, Filter, Calendar, TrendingUp, DollarSign, PieChart as PieIcon, Package, ShoppingBag, BarChart3, Loader2, Zap, Activity, Globe, Cpu } from 'lucide-react';
 import api from '../services/api';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -28,6 +29,7 @@ export default function ReportsPage() {
   }, []);
 
   const fetchData = async () => {
+    setLoading(true);
     try {
       const [summaryRes, yearlyRes, distRes, topRes] = await Promise.all([
         api.get('/api/reports/summary'),
@@ -52,7 +54,7 @@ export default function ReportsPage() {
       const canvas = await html2canvas(reportRef.current, {
         scale: 2,
         useCORS: true,
-        backgroundColor: document.documentElement.classList.contains('dark') ? '#0f172a' : '#ffffff'
+        backgroundColor: '#ffffff'
       });
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
@@ -69,134 +71,135 @@ export default function ReportsPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
-      </div>
-    );
-  }
+  if (loading) return (
+    <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
+      <div className="w-12 h-12 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin" />
+      <p className="text-sm font-semibold text-slate-500">Loading reports...</p>
+    </div>
+  );
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold dark:text-white">Business Reports</h1>
-          <p className="text-slate-500 dark:text-slate-400">Detailed analytics and performance metrics.</p>
+    <div className="space-y-10 pb-20">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-200 dark:border-slate-800 pb-10">
+        <div className="space-y-1">
+            <h1 className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
+                Analytics & Insights
+            </h1>
+            <p className="text-slate-500 font-medium">
+                View detailed reports of your store performance.
+            </p>
         </div>
         <div className="flex items-center gap-3">
           <button 
             onClick={fetchData}
-            className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-bold dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+            className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-indigo-600 transition-all shadow-sm"
           >
-            <Calendar className="w-4 h-4" /> Refresh Data
+            <Calendar className="w-4 h-4" /> Refresh
           </button>
           <button 
             onClick={handleExportPDF}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-all"
+            className="flex items-center gap-2 px-8 py-3 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20"
           >
             <Download className="w-4 h-4" /> Export PDF
           </button>
         </div>
       </div>
 
-      <div ref={reportRef} className="space-y-8 p-4 bg-transparent">
+      <div ref={reportRef} className="space-y-12">
         {/* Summary Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
-            <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-4">
-              <DollarSign className="w-5 h-5" />
+          {[
+            { label: 'Total Revenue', val: `₹${parseFloat(summary.total_revenue).toLocaleString()}`, icon: DollarSign, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+            { label: 'Total Profit', val: `₹${parseFloat(summary.total_profit).toLocaleString()}`, icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+            { label: 'Total Orders', val: summary.total_orders, icon: ShoppingBag, color: 'text-blue-600', bg: 'bg-blue-50' },
+            { label: 'GST Collected', val: `₹${parseFloat(summary.gst_collected).toLocaleString()}`, icon: Filter, color: 'text-purple-600', bg: 'bg-purple-50' },
+          ].map((stat) => (
+            <div key={stat.label} className="bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-200 dark:border-slate-800 relative group overflow-hidden shadow-sm">
+                <div className={`w-12 h-12 rounded-2xl ${stat.bg} flex items-center justify-center mb-6`}>
+                  <stat.icon className={`w-6 h-6 ${stat.color}`} />
+                </div>
+                <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">{stat.label}</p>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{stat.val}</h3>
             </div>
-            <p className="text-slate-500 dark:text-slate-400 text-sm font-bold mb-1">Total Revenue</p>
-            <h3 className="text-2xl font-black dark:text-white">₹{parseFloat(summary.total_revenue).toLocaleString()}</h3>
-          </div>
-          
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-4">
-              <TrendingUp className="w-5 h-5" />
-            </div>
-            <p className="text-slate-500 dark:text-slate-400 text-sm font-bold mb-1">Total Net Profit</p>
-            <h3 className="text-2xl font-black dark:text-white">₹{parseFloat(summary.total_profit).toLocaleString()}</h3>
-          </div>
-
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
-            <div className="w-10 h-10 rounded-xl bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 flex items-center justify-center mb-4">
-              <ShoppingBag className="w-5 h-5" />
-            </div>
-            <p className="text-slate-500 dark:text-slate-400 text-sm font-bold mb-1">Total Orders</p>
-            <h3 className="text-2xl font-black dark:text-white">{summary.total_orders}</h3>
-          </div>
-
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
-            <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-4">
-              <Filter className="w-5 h-5" />
-            </div>
-            <p className="text-slate-500 dark:text-slate-400 text-sm font-bold mb-1">GST Collected</p>
-            <h3 className="text-2xl font-black dark:text-white">₹{parseFloat(summary.gst_collected).toLocaleString()}</h3>
-          </div>
+          ))}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Revenue Yearly Chart */}
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
-            <h3 className="text-lg font-bold dark:text-white mb-8">Yearly Revenue Growth</h3>
+          <div className="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm">
+            <div className="flex items-center justify-between mb-10">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Revenue History</h3>
+                <Activity className="w-5 h-5 text-indigo-500 opacity-20" />
+            </div>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={yearlyRevenue}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#64748b'}} />
-                  <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#64748b'}} />
+                <ReBarChart data={yearlyRevenue}>
+                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#64748b', fontWeight: 700}} />
+                  <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#64748b', fontWeight: 700}} />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '12px', color: '#fff' }}
-                    itemStyle={{ color: '#fff' }}
-                    cursor={{fill: 'rgba(79, 70, 229, 0.1)'}}
+                    contentStyle={{ backgroundColor: '#fff', border: 'none', borderRadius: '1rem', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
                   />
-                  <Bar dataKey="revenue" fill="#4f46e5" radius={[6, 6, 0, 0]} barSize={40} />
-                </BarChart>
+                  <Bar dataKey="revenue" radius={[6, 6, 0, 0]} barSize={30}>
+                    {yearlyRevenue.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill="#4f46e5" fillOpacity={0.8} />
+                    ))}
+                  </Bar>
+                </ReBarChart>
               </ResponsiveContainer>
             </div>
           </div>
 
           {/* Category Revenue Chart */}
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
-            <h3 className="text-lg font-bold dark:text-white mb-8">Category Revenue Share</h3>
+          <div className="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm">
+            <div className="flex items-center justify-between mb-10">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Category Revenue</h3>
+                <PieIcon className="w-5 h-5 text-emerald-500 opacity-20" />
+            </div>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={categoryDist}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#64748b'}} />
-                  <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#64748b'}} />
+                <ReBarChart data={categoryDist} layout="vertical">
+                  <XAxis type="number" hide />
+                  <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#64748b', fontWeight: 700}} width={100} />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '12px', color: '#fff' }}
-                    itemStyle={{ color: '#fff' }}
-                    cursor={{fill: 'rgba(16, 185, 129, 0.1)'}}
+                    contentStyle={{ backgroundColor: '#fff', border: 'none', borderRadius: '1rem', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
                   />
-                  <Bar dataKey="revenue" fill="#10b981" radius={[6, 6, 0, 0]} barSize={40} />
-                </BarChart>
+                  <Bar dataKey="revenue" fill="#10b981" fillOpacity={0.8} radius={[0, 6, 6, 0]} barSize={20} />
+                </ReBarChart>
               </ResponsiveContainer>
             </div>
           </div>
         </div>
 
         {/* Top Products Row */}
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
-          <h3 className="text-lg font-bold dark:text-white mb-8">Top Selling Products</h3>
+        <div className="bg-white dark:bg-slate-900 p-10 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
+          <div className="flex items-center justify-between mb-12">
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Top Products Performance</h3>
+                <Zap className="w-6 h-6 text-amber-500 opacity-40" />
+          </div>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={topProducts}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#64748b'}} />
-                <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#64748b'}} />
+              <ReBarChart data={topProducts}>
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#64748b', fontWeight: 700}} />
+                <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#64748b', fontWeight: 700}} />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '12px', color: '#fff' }}
-                  itemStyle={{ color: '#fff' }}
-                  cursor={{fill: 'rgba(245, 158, 11, 0.1)'}}
+                  contentStyle={{ backgroundColor: '#fff', border: 'none', borderRadius: '1rem', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
                 />
-                <Bar dataKey="total_sold" fill="#f59e0b" radius={[6, 6, 0, 0]} barSize={60} />
-              </BarChart>
+                <Bar dataKey="total_sold" radius={[8, 8, 0, 0]} barSize={60}>
+                  {topProducts.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill="#f59e0b" fillOpacity={0.8} />
+                  ))}
+                </Bar>
+              </ReBarChart>
             </ResponsiveContainer>
           </div>
         </div>
+      </div>
+      
+      <div className="flex justify-center pt-8">
+          <div className="flex items-center gap-3 px-6 py-2 bg-slate-50 dark:bg-slate-900 rounded-full border border-slate-200 dark:border-slate-800 opacity-50">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">CoreBiz SaaS Reports System</span>
+          </div>
       </div>
     </div>
   );

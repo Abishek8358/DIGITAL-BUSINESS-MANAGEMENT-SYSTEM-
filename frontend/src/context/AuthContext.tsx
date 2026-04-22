@@ -4,7 +4,7 @@ import api from '../services/api';
 interface User {
   id: number;
   email: string;
-  role: 'admin' | 'employee';
+  role: 'admin' | 'owner' | 'employee' | 'manager' | 'sales' | 'helper';
   name: string;
   store_id: number;
 }
