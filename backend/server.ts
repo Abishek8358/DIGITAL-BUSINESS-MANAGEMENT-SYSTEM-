@@ -10,7 +10,14 @@ dotenv.config({ override: true });
 const JWT_SECRET = process.env.JWT_SECRET || 'corebiz-secret-key';
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: [
+    'https://abishek8358.github.io',
+    'http://localhost:5173',
+    'http://localhost:3000'
+  ],
+  credentials: true
+}));
 app.use(express.json());
 
 import multer from 'multer';
