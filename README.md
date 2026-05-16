@@ -15,9 +15,8 @@ The project is built on a clean three-tier architecture:
 
 ## Features
 - **Hierarchy-Based Stock Control**: Category → Product → Brand → Variant level tracking with separate pricing.
-- **SMS Billing**: Integrated Fast2SMS for automated customer purchase receipts.
 - **Complaint System**: Internal employee-to-admin feedback system with status tracking.
-- **POS / Billing**: Fast checkout with automated invoice generation, PDF download, and SMS confirmation.
+- **POS / Billing**: Fast checkout with automated invoice generation and PDF download.
 - **Analytics**: Revenue trends, category distribution, and top product charts.
 - **Dark Mode**: Full system-wide glassmorphism aesthetic support.
 

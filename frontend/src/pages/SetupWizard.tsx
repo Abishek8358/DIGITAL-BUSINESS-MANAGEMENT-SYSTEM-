@@ -77,8 +77,9 @@ export default function SetupWizard() {
   };
 
   const addProduct = () => {
-    if (!productForm.name || !productForm.categoryId || !productForm.costPrice || !productForm.sellingPrice) return;
-    setProducts([...products, { ...productForm, id: Date.now() }]);
+    if (!productForm.name || !productForm.categoryId || !productForm.costPrice) return;
+    const calculatedSellingPrice = ((parseFloat(productForm.costPrice || '0')) * (1 + (parseFloat(productForm.gstPercent || '0') / 100))).toFixed(2);
+    setProducts([...products, { ...productForm, sellingPrice: calculatedSellingPrice, id: Date.now() }]);
     setProductForm({
       name: '', categoryId: '', brand: '', costPrice: '', sellingPrice: '',
       gstPercent: '0', stock: '0', minimumStock: '5', reorderQuantity: '10',
@@ -345,8 +346,7 @@ export default function SetupWizard() {
 
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                   {[
-                    { l: 'Cost Price', k: 'costPrice', t: 'number' },
-                    { l: 'Selling Price', k: 'sellingPrice', t: 'number' },
+                    { l: 'Cost Price ₹ *', k: 'costPrice', t: 'number' },
                     { l: 'GST %', k: 'gstPercent', t: 'number' },
                     { l: 'Stock', k: 'stock', t: 'number' },
                   ].map((f) => (
@@ -356,6 +356,12 @@ export default function SetupWizard() {
                         value={(productForm as any)[f.k]} onChange={e => setProductForm({ ...productForm, [f.k]: e.target.value })} />
                     </div>
                   ))}
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Selling Price (Auto) ₹</label>
+                    <div className="w-full p-4 bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-500 font-bold text-sm flex items-center h-[54px] shadow-sm">
+                      {((parseFloat(productForm.costPrice || '0')) * (1 + (parseFloat(productForm.gstPercent || '0') / 100))).toFixed(2)}
+                    </div>
+                  </div>
                   <div className="flex items-end">
                     <button
                       onClick={addProduct}

@@ -58,43 +58,7 @@ const authenticateToken = (req: any, res: any, next: any) => {
   });
 };
 
-// --- SMS Helper (Fast2SMS — set FAST2SMS_API_KEY in .env to enable) ---
-const sendSMS = async (phone: string, message: string): Promise<void> => {
-  try {
-    const apiKey = process.env.FAST2SMS_API_KEY;
-    if (!apiKey) {
-      console.log('[SMS] No FAST2SMS_API_KEY set — skipping SMS to', phone);
-      return;
-    }
-    const clean = phone.replace(/\D/g, '').slice(-10);
-    if (clean.length !== 10) {
-      console.warn('[SMS] Invalid phone number:', phone);
-      return;
-    }
-    const body = JSON.stringify({
-      route: 'q', message, language: 'english', flash: 0, numbers: clean
-    });
-    const https = await import('https');
-    const options = {
-      hostname: 'www.fast2sms.com',
-      path: '/dev/bulkV2',
-      method: 'POST',
-      headers: { authorization: apiKey, 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) }
-    };
-    await new Promise<void>((resolve) => {
-      const req = https.request(options, (res: any) => {
-        let data = '';
-        res.on('data', (c: any) => { data += c; });
-        res.on('end', () => { console.log('[SMS] Sent to', clean, ':', data); resolve(); });
-      });
-      req.on('error', (e: any) => { console.error('[SMS] Error:', e.message); resolve(); });
-      req.write(body);
-      req.end();
-    });
-  } catch (e: any) {
-    console.error('[SMS] Unexpected error:', e.message);
-  }
-};
+// --- SMS Helper Removed ---
 
 // --- API Routes ---
 
@@ -609,10 +573,16 @@ app.get('/api/customers', authenticateToken, async (req: any, res) => {
   try {
     // Return unique customers per store based on phone
     const result = await pool.query(`
-      SELECT DISTINCT ON (phone) id, name, phone as "mobile", total_spent as "totalPurchases", last_visit as "lastPurchaseDate", loyalty_points as "loyaltyPoints" 
-      FROM customers 
-      WHERE store_id = $1 
-      ORDER BY phone, last_visit DESC
+      SELECT DISTINCT ON (c.phone) c.id, c.name, c.phone as "mobile", c.total_spent as "totalPurchases", c.last_visit as "lastPurchaseDate", c.loyalty_points as "loyaltyPoints",
+             (SELECT string_agg(DISTINCT cat.name, ', ')
+              FROM sales s
+              JOIN sale_items si ON s.id = si.saleid
+              JOIN products p ON si.productid = p.id
+              JOIN categories cat ON p.categoryid = cat.id
+              WHERE s.customerid = c.id) as "stores"
+      FROM customers c
+      WHERE c.store_id = $1 
+      ORDER BY c.phone, c.last_visit DESC
     `, [req.user.store_id]);
     res.json(result.rows);
   } catch(err: any) {
@@ -653,9 +623,10 @@ app.get('/api/customers/:id/history', authenticateToken, async (req: any, res) =
   try {
     const history = await pool.query(`
       SELECT s.id, s.invoiceid as "invoiceId", s.grandtotal as "total", s.date,
-             (SELECT json_agg(json_build_object('productName', p.name, 'quantity', si.quantity, 'total', si.total))
+             (SELECT json_agg(json_build_object('productName', p.name, 'categoryName', c.name, 'quantity', si.quantity, 'total', si.total))
               FROM sale_items si
               JOIN products p ON si.productid = p.id
+              LEFT JOIN categories c ON p.categoryid = c.id
               WHERE si.saleid = s.id) as items
       FROM sales s
       WHERE s.customerid = $1 AND s.store_id = $2
@@ -802,15 +773,6 @@ app.post('/api/sales', authenticateToken, async (req: any, res) => {
     client.release();
   }
 
-  // ── SMS Bill: fire-and-forget AFTER response is sent (never blocks checkout) ────
-  if (customerPhone) {
-    try {
-      const storeName = await pool.query('SELECT store_name FROM stores WHERE id = $1', [req.user.store_id]);
-      const sName = storeName.rows[0]?.store_name || 'CoreBiz';
-      const smsText = `Thank you for shopping at ${sName}!\nInvoice: ${invoiceId}\nTotal: Rs.${grandTotal}\nVisit again!\n-${sName}`;
-      sendSMS(customerPhone, smsText);
-    } catch (_) { /* SMS errors are non-fatal */ }
-  }
 });
 
 app.get('/api/sales/:id', authenticateToken, async (req: any, res) => {
@@ -848,11 +810,11 @@ app.get('/api/dashboard/stats', authenticateToken, async (req: any, res) => {
       pool.query('SELECT COUNT(*) as count FROM sales WHERE store_id = $1', [req.user.store_id]),
       pool.query('SELECT COUNT(*) as count FROM customers WHERE store_id = $1', [req.user.store_id]),
       pool.query(`
-        SELECT to_char(month, 'Mon') as month, COALESCE(SUM(s.grandtotal), 0) as revenue
-        FROM generate_series(date_trunc('year', CURRENT_DATE), date_trunc('year', CURRENT_DATE) + interval '11 months', interval '1 month') AS month
-        LEFT JOIN sales s ON date_trunc('month', s.date) = month AND s.store_id = $1
-        GROUP BY month
-        ORDER BY month
+        SELECT to_char(m.month, 'Mon') as month, COALESCE(SUM(s.grandtotal), 0) as revenue
+        FROM generate_series(date_trunc('year', CURRENT_DATE), date_trunc('year', CURRENT_DATE) + interval '11 months', interval '1 month') AS m(month)
+        LEFT JOIN sales s ON date_trunc('month', s.date) = m.month AND s.store_id = $1
+        GROUP BY m.month
+        ORDER BY m.month ASC
       `, [req.user.store_id]),
       pool.query(`
         (SELECT p.id as "id", p.name as "name", p.brand as "brand", p.stock, s.low_stock_threshold as "threshold", 'product' as "type"
@@ -1076,12 +1038,12 @@ app.get('/api/reports/yearly-revenue', authenticateToken, async (req: any, res) 
   try {
     const result = await pool.query(`
       SELECT 
-        to_char(month, 'Mon') as month, 
+        to_char(m.month, 'Mon') as month, 
         COALESCE(SUM(s.grandtotal), 0) as revenue
-      FROM generate_series(date_trunc('year', CURRENT_DATE), date_trunc('year', CURRENT_DATE) + interval '11 months', interval '1 month') AS month
-      LEFT JOIN sales s ON date_trunc('month', s.date) = month AND s.store_id = $1
-      GROUP BY month
-      ORDER BY month
+      FROM generate_series(date_trunc('year', CURRENT_DATE), date_trunc('year', CURRENT_DATE) + interval '11 months', interval '1 month') AS m(month)
+      LEFT JOIN sales s ON date_trunc('month', s.date) = m.month AND s.store_id = $1
+      GROUP BY m.month
+      ORDER BY m.month ASC
     `, [req.user.store_id]);
     res.json(result.rows);
   } catch(err: any) {
@@ -1127,11 +1089,143 @@ app.get('/api/reports/top-products', authenticateToken, async (req: any, res) =>
   }
 });
 
+// ── Detailed Analytics Dashboard ──────────────────────────────────────────────
+app.get('/api/analytics/dashboard', authenticateToken, async (req: any, res) => {
+  const { filter = 'all' } = req.query;
+  console.log(`[Analytics] Request for store ${req.user.store_id}, filter: ${filter}`);
+  let dateFilter = 'TRUE';
+  
+  if (filter === 'today') dateFilter = "s.date >= CURRENT_DATE";
+  else if (filter === 'week') dateFilter = "s.date >= CURRENT_DATE - interval '7 days'";
+  else if (filter === 'month') dateFilter = "s.date >= CURRENT_DATE - interval '30 days'";
+
+  try {
+    const [
+      summaryRes,
+      profitRes,
+      stockRes,
+      topProductsRes,
+      leastProductsRes,
+      profitableProductsRes,
+      customerRes,
+      dailyTrendRes
+    ] = await Promise.all([
+      // 1. Basic Summary
+      pool.query(`
+        SELECT 
+          COALESCE(SUM(s.grandtotal), 0) as total_revenue,
+          COUNT(*) as total_sales,
+          COALESCE(AVG(s.grandtotal), 0) as avg_order_value
+        FROM sales s
+        WHERE s.store_id = $1 AND ${dateFilter}
+      `, [req.user.store_id]),
+
+      // 2. Profit Analysis
+      pool.query(`
+        SELECT 
+          COALESCE(SUM(si.quantity * (si.unitprice - COALESCE(v.cost_price, p.costprice))), 0) AS total_profit
+        FROM sale_items si
+        LEFT JOIN variants v ON si.variant_id = v.id
+        LEFT JOIN products p ON si.productid = p.id
+        JOIN sales s ON si.saleid = s.id
+        WHERE s.store_id = $1 AND ${dateFilter}
+      `, [req.user.store_id]),
+
+      // 3. Stock Summary
+      pool.query(`
+        SELECT 
+          (SELECT COUNT(*) FROM products WHERE store_id = $1) as total_products,
+          (SELECT COUNT(*) FROM products p JOIN store_settings ss ON p.store_id = ss.store_id WHERE p.stock < ss.low_stock_threshold AND p.store_id = $1) +
+          (SELECT COUNT(*) FROM variants v JOIN store_settings ss ON v.store_id = ss.store_id WHERE v.stock < ss.low_stock_threshold AND v.store_id = $1) as low_stock_count,
+          (SELECT COUNT(*) FROM products WHERE stock <= 0 AND store_id = $1) +
+          (SELECT COUNT(*) FROM variants WHERE stock <= 0 AND store_id = $1) as out_of_stock_count,
+          COALESCE((SELECT SUM(stock) FROM products WHERE store_id = $1), 0) + 
+          COALESCE((SELECT SUM(stock) FROM variants WHERE store_id = $1), 0) as total_stock
+      `, [req.user.store_id]),
+
+      // 4. Top Selling
+      pool.query(`
+        SELECT p.name, SUM(si.quantity) as total_sold
+        FROM sale_items si
+        JOIN products p ON si.productid = p.id
+        JOIN sales s ON si.saleid = s.id
+        WHERE p.store_id = $1 AND ${dateFilter}
+        GROUP BY p.name ORDER BY total_sold DESC LIMIT 5
+      `, [req.user.store_id]),
+
+      // 5. Least Selling
+      pool.query(`
+        SELECT p.name, SUM(si.quantity) as total_sold
+        FROM sale_items si
+        JOIN products p ON si.productid = p.id
+        JOIN sales s ON si.saleid = s.id
+        WHERE p.store_id = $1 AND ${dateFilter}
+        GROUP BY p.name ORDER BY total_sold ASC LIMIT 5
+      `, [req.user.store_id]),
+
+      // 6. Most Profitable Products
+      pool.query(`
+        SELECT 
+          p.name, 
+          SUM(si.quantity * (si.unitprice - COALESCE(v.cost_price, p.costprice))) as total_profit
+        FROM sale_items si
+        LEFT JOIN variants v ON si.variant_id = v.id
+        LEFT JOIN products p ON si.productid = p.id
+        JOIN sales s ON si.saleid = s.id
+        WHERE s.store_id = $1 AND ${dateFilter}
+        GROUP BY p.name ORDER BY total_profit DESC LIMIT 5
+      `, [req.user.store_id]),
+
+      // 7. Customer Insights
+      pool.query(`
+        SELECT 
+          (SELECT COUNT(*) FROM customers WHERE store_id = $1) as total_customers,
+          c.name, COUNT(s.id) as purchase_count
+        FROM customers c
+        LEFT JOIN sales s ON c.id = s.customerid
+        WHERE c.store_id = $1
+        GROUP BY c.name ORDER BY purchase_count DESC LIMIT 5
+      `, [req.user.store_id]),
+
+      // 8. Daily Trend (Last 7 Days)
+      pool.query(`
+        SELECT to_char(d, 'Dy') as day, COALESCE(SUM(s.grandtotal), 0) as revenue
+        FROM generate_series(CURRENT_DATE - interval '6 days', CURRENT_DATE, interval '1 day') AS d
+        LEFT JOIN sales s ON date_trunc('day', s.date) = d AND s.store_id = $1
+        GROUP BY d ORDER BY d ASC
+      `, [req.user.store_id])
+    ]);
+
+    console.log(`[Analytics] Results for store ${req.user.store_id}:`, {
+      revenue: summaryRes.rows[0]?.total_revenue,
+      sales: summaryRes.rows[0]?.total_sales,
+      products: stockRes.rows[0]?.total_products
+    });
+
+    res.json({
+      summary: summaryRes.rows[0],
+      profit: profitRes.rows[0].total_profit,
+      stock: stockRes.rows[0],
+      topSelling: topProductsRes.rows,
+      leastSelling: leastProductsRes.rows,
+      mostProfitable: profitableProductsRes.rows,
+      customers: {
+        total: customerRes.rows[0]?.total_customers || 0,
+        frequent: customerRes.rows.slice(0, 5)
+      },
+      dailyTrend: dailyTrendRes.rows
+    });
+  } catch (err: any) {
+    console.error('Analytics Error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Employees
 app.get('/api/employees', authenticateToken, async (req: any, res) => {
   if (req.user.role === 'employee') return res.sendStatus(403);
   try {
-    const employees = await pool.query("SELECT id, email, role, name, status, salary, join_date as \"joinDate\", phone, created_at FROM users WHERE role IN ('employee', 'manager', 'sales', 'helper') AND store_id = $1 ORDER BY status ASC, created_at DESC", [req.user.store_id]);
+    const employees = await pool.query("SELECT id, email, role, name, status, salary, join_date as \"joinDate\", phone, shop, created_at FROM users WHERE role IN ('employee', 'manager', 'sales', 'helper') AND store_id = $1 ORDER BY status ASC, created_at DESC", [req.user.store_id]);
     res.json(employees.rows);
   } catch(err: any) {
     res.status(500).json({ error: err.message });
@@ -1140,10 +1234,10 @@ app.get('/api/employees', authenticateToken, async (req: any, res) => {
 
 app.put('/api/employees/:id', authenticateToken, async (req: any, res) => {
   if (req.user.role === 'employee') return res.sendStatus(403);
-  const { name, email, phone, salary, role, status, joinDate } = req.body;
+  const { name, email, phone, salary, role, status, joinDate, shop } = req.body;
   try {
     // Build update dynamically to support partial updates (e.g. just status)
-    const current = await pool.query('SELECT name, email, phone, salary, role, status, join_date FROM users WHERE id = $1 AND store_id = $2', [req.params.id, req.user.store_id]);
+    const current = await pool.query('SELECT name, email, phone, salary, role, status, join_date, shop FROM users WHERE id = $1 AND store_id = $2', [req.params.id, req.user.store_id]);
     if (current.rows.length === 0) return res.status(404).json({ message: 'Employee not found' });
     const c = current.rows[0];
 
@@ -1154,11 +1248,12 @@ app.put('/api/employees/:id', authenticateToken, async (req: any, res) => {
     const finalRole = role ?? c.role;
     const finalStatus = status ?? c.status;
     const finalJoinDate = joinDate ?? c.join_date;
+    const finalShop = shop ?? c.shop;
 
     await pool.query(`
-      UPDATE users SET name=$1, email=$2, phone=$3, salary=$4, role=$5, status=$6, join_date=$7
+      UPDATE users SET name=$1, email=$2, phone=$3, salary=$4, role=$5, status=$6, join_date=$7, shop=$10
       WHERE id=$8 AND store_id=$9
-    `, [finalName, finalEmail, finalPhone, finalSalary, finalRole, finalStatus, finalJoinDate, req.params.id, req.user.store_id]);
+    `, [finalName, finalEmail, finalPhone, finalSalary, finalRole, finalStatus, finalJoinDate, req.params.id, req.user.store_id, finalShop]);
     res.json({ success: true });
   } catch(err: any) {
     console.error('Employee Update Error:', err);
@@ -1168,7 +1263,7 @@ app.put('/api/employees/:id', authenticateToken, async (req: any, res) => {
 
 app.post('/api/employees', authenticateToken, async (req: any, res) => {
   if (req.user.role === 'employee') return res.sendStatus(403);
-  const { email, password, name, role = 'employee', salary, joinDate } = req.body;
+  const { email, password, name, role = 'employee', salary, joinDate, phone, shop } = req.body;
   const hash = bcrypt.hashSync(password, 10);
   
   try {
@@ -1185,8 +1280,8 @@ app.post('/api/employees', authenticateToken, async (req: any, res) => {
     }
 
     await pool.query(
-      'INSERT INTO users (email, password, role, name, status, store_id, salary, join_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)', 
-      [email, hash, role, name, 'active', req.user.store_id, finalSalary || 0, joinDate || new Date()]
+      'INSERT INTO users (email, password, role, name, status, store_id, salary, join_date, phone, shop) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)', 
+      [email, hash, role, name, 'active', req.user.store_id, finalSalary || 0, joinDate || new Date(), phone, shop]
     );
     res.json({ success: true });
   } catch (e: any) {
@@ -1435,6 +1530,9 @@ const runMigrations = async () => {
       ALTER TABLE users ADD CONSTRAINT users_role_check
       CHECK (role IN ('admin', 'employee', 'manager', 'sales', 'helper', 'owner'))
     `);
+    
+    // Add shop column for classification
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS shop VARCHAR(255)`);
 
     // 5. Ensure sale_items has variant_id column (added in hierarchy upgrade)
     await pool.query(`ALTER TABLE sale_items ADD COLUMN IF NOT EXISTS variant_id INT`);

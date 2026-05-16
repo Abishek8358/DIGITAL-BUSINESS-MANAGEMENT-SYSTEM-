@@ -11,7 +11,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  
+
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -21,6 +21,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const res = await api.post('/api/auth/login', { email, password, role });
+      
       login(res.data.token, res.data.user);
       
       const tokenHeader = { headers: { Authorization: `Bearer ${res.data.token}` } };
@@ -66,6 +67,7 @@ export default function LoginPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="p-10 pt-6 space-y-8">
+
           {error && (
             <div className="bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 p-4 rounded-2xl text-xs font-bold uppercase tracking-wider border border-red-100 dark:border-red-900/30 flex items-center gap-3 animate-in shake duration-300">
                <ShieldCheck className="w-5 h-5 opacity-50" /> {error}

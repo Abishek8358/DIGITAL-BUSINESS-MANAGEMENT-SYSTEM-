@@ -7,7 +7,7 @@ export default function EmployeeManagement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<any>(null);
   const [formData, setFormData] = useState({ 
-    name: '', email: '', password: '', role: 'employee', salary: '', status: 'active', phone: '',
+    name: '', email: '', password: '', role: 'employee', salary: '', status: 'active', phone: '', shop: '',
     joinDate: new Date().toISOString().split('T')[0] 
   });
   const [loading, setLoading] = useState(true);
@@ -39,12 +39,13 @@ export default function EmployeeManagement() {
         salary: employee.salary.toString(),
         status: employee.status,
         phone: employee.phone || '',
+        shop: employee.shop || '',
         joinDate: new Date(employee.joinDate).toISOString().split('T')[0]
       });
     } else {
       setEditingEmployee(null);
       setFormData({ 
-        name: '', email: '', password: '', role: 'employee', salary: '', status: 'active', phone: '',
+        name: '', email: '', password: '', role: 'employee', salary: '', status: 'active', phone: '', shop: '',
         joinDate: new Date().toISOString().split('T')[0] 
       });
     }
@@ -150,6 +151,9 @@ export default function EmployeeManagement() {
               </div>
               <div className="flex items-center gap-3 text-sm font-medium text-slate-500">
                 <Shield className="w-4 h-4" /> Role: <span className="text-indigo-600 dark:text-indigo-400 font-bold capitalize">{emp.role}</span>
+              </div>
+              <div className="flex items-center gap-3 text-sm font-medium text-slate-500">
+                <Globe className="w-4 h-4" /> Shop: <span className="text-slate-900 dark:text-white font-bold capitalize">{emp.shop || 'Unassigned'}</span>
               </div>
               <div className="flex items-center gap-3 text-sm font-medium text-slate-500">
                 <DollarSign className="w-4 h-4" /> Salary: <span className="text-slate-900 dark:text-white font-bold">₹{parseFloat(emp.salary).toLocaleString()}</span>
@@ -293,6 +297,19 @@ export default function EmployeeManagement() {
                         onChange={e => setFormData({...formData, salary: e.target.value})}
                       />
                   </div>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Assigned Shop / Category</label>
+                <div className="relative">
+                    <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <input 
+                      type="text"
+                      className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-900 dark:text-white font-bold text-sm outline-none shadow-sm"
+                      placeholder="e.g. Electronics, Main Store"
+                      value={formData.shop}
+                      onChange={e => setFormData({...formData, shop: e.target.value})}
+                    />
                 </div>
               </div>
               <div className="pt-4">

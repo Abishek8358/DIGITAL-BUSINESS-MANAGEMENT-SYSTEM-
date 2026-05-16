@@ -92,6 +92,7 @@ export default function CustomerManagement() {
               <tr className="bg-slate-50 dark:bg-slate-800/60 text-slate-500 text-[10px] uppercase font-bold tracking-widest">
                 <th className="px-10 py-6">Customer Name</th>
                 <th className="px-10 py-6">Mobile Number</th>
+                <th className="px-10 py-6">Stores</th>
                 <th className="px-10 py-6">Total Spent</th>
                 <th className="px-10 py-6">Last Visit</th>
                 <th className="px-10 py-6 text-right">History</th>
@@ -111,6 +112,13 @@ export default function CustomerManagement() {
                   <td className="px-10 py-6">
                     <div className="flex items-center gap-2 text-slate-500 font-semibold text-sm">
                       <Phone className="w-4 h-4 text-slate-400" /> {customer.phone || customer.mobile || 'N/A'}
+                    </div>
+                  </td>
+                  <td className="px-10 py-6">
+                    <div className="flex flex-wrap gap-1 max-w-[150px]">
+                      {customer.stores ? customer.stores.split(', ').map((store: string, idx: number) => (
+                        <span key={idx} className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-md uppercase tracking-widest border border-emerald-100 dark:border-emerald-500/20 truncate">{store}</span>
+                      )) : <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">General</span>}
                     </div>
                   </td>
                   <td className="px-10 py-6">
@@ -189,7 +197,10 @@ export default function CustomerManagement() {
                         <div key={idx} className="flex items-center justify-between text-xs font-medium">
                           <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
                             <Package className="w-3.5 h-3.5" />
-                            <span>{item.productName} <span className="text-slate-400">x</span> {item.quantity}</span>
+                            <span>{item.productName} 
+                              {item.categoryName && <span className="text-[9px] font-bold text-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 px-2 py-0.5 rounded-md ml-1.5 uppercase tracking-widest">{item.categoryName}</span>}
+                              <span className="text-slate-400 ml-1.5">x</span> {item.quantity}
+                            </span>
                           </div>
                           <span className="font-bold text-slate-900 dark:text-white">₹{parseFloat(item.total).toLocaleString()}</span>
                         </div>

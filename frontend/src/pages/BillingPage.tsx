@@ -756,12 +756,7 @@ export default function BillingPage() {
                 </div>
               )}
 
-              <div className="p-5 bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/10 rounded-2xl flex items-start gap-3">
-                <Info className="w-5 h-5 text-indigo-600 flex-shrink-0 mt-0.5" />
-                <p className="text-xs font-medium text-slate-600 dark:text-slate-400">
-                  Entering a mobile number will allow the customer to receive invoice notifications via SMS.
-                </p>
-              </div>
+
 
               {/* Payable Amount with discount */}
               {pointsToRedeem > 0 && (
@@ -898,7 +893,7 @@ export default function BillingPage() {
               </div>
             )}
 
-            {/* Thank You + SMS notice */}
+            {/* Thank You */}
             <div className="px-8 py-6 text-center space-y-4">
               {receipt.pointsEarned > 0 ? (
                 <div className="bg-gradient-to-r from-amber-50 to-emerald-50 dark:from-amber-950/20 dark:to-emerald-950/20 border border-amber-200 dark:border-amber-800 py-4 px-5 rounded-2xl">
@@ -908,14 +903,6 @@ export default function BillingPage() {
                 </div>
               ) : (
                 <p className="text-sm font-bold text-slate-500 italic">Thank you for shopping!</p>
-              )}
-
-              {receipt.customerPhone && (
-                <div className="bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 py-3 px-5 rounded-2xl">
-                  <p className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
-                    SMS receipt sent to {receipt.customerPhone}
-                  </p>
-                </div>
               )}
 
               <div className="space-y-3 pt-2">

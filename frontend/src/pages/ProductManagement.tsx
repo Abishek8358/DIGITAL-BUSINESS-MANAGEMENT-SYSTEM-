@@ -20,8 +20,9 @@ function VariantRow({ variant, onRefresh, isAdmin }: any) {
   const handleSave = async () => {
     setSaving(true);
     try {
+      const calculatedSellingPrice = ((parseFloat(form.costPrice?.toString() || '0')) * (1 + (parseFloat(form.gstPercent?.toString() || '0') / 100))).toFixed(2);
       await api.put(`/api/variants/${variant.id}`, {
-        variantName: form.variantName, sellingPrice: form.sellingPrice,
+        variantName: form.variantName, sellingPrice: calculatedSellingPrice,
         costPrice: form.costPrice, gstPercent: form.gstPercent,
         stock: form.stock, minimumStock: form.minimumStock, imageUrl: form.imageUrl
       });
@@ -60,21 +61,20 @@ function VariantRow({ variant, onRefresh, isAdmin }: any) {
               value={form.variantName} onChange={e => setForm({ ...form, variantName: e.target.value })} />
           </div>
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Selling Price ₹</label>
-            <input type="number" className="w-full p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 font-bold text-sm shadow-sm outline-none"
-              value={form.sellingPrice} onChange={e => setForm({ ...form, sellingPrice: e.target.value })} />
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Cost Price ₹ *</label>
+            <input type="number" required className="w-full p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 font-bold text-sm shadow-sm outline-none"
+              value={form.costPrice} onChange={e => setForm({ ...form, costPrice: e.target.value })} />
           </div>
-          {isAdmin && (
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Cost Price ₹</label>
-              <input type="number" className="w-full p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-500 font-bold text-sm shadow-sm outline-none"
-                value={form.costPrice} onChange={e => setForm({ ...form, costPrice: e.target.value })} />
-            </div>
-          )}
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">GST %</label>
             <input type="number" className="w-full p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm font-bold shadow-sm outline-none"
               value={form.gstPercent} onChange={e => setForm({ ...form, gstPercent: e.target.value })} />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Selling Price (Auto) ₹</label>
+            <div className="w-full p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950 text-slate-500 font-bold text-sm shadow-sm flex items-center h-[46px]">
+              {((parseFloat(form.costPrice?.toString() || '0')) * (1 + (parseFloat(form.gstPercent?.toString() || '0') / 100))).toFixed(2)}
+            </div>
           </div>
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Stock</label>
@@ -183,7 +183,11 @@ function AddVariantForm({ brandId, onDone }: any) {
   const [loading, setLoading] = useState(false);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true);
-    try { await api.post('/api/variants', { brandId, ...form }); onDone(); }
+    try { 
+      const calculatedSellingPrice = ((parseFloat(form.costPrice || '0')) * (1 + (parseFloat(form.gstPercent || '0') / 100))).toFixed(2);
+      await api.post('/api/variants', { brandId, ...form, sellingPrice: calculatedSellingPrice }); 
+      onDone(); 
+    }
     catch (err: any) { alert(err.response?.data?.error || 'Failed to add variant'); }
     finally { setLoading(false); }
   };
@@ -199,19 +203,20 @@ function AddVariantForm({ brandId, onDone }: any) {
             value={form.variantName} onChange={e => setForm({ ...form, variantName: e.target.value })} />
         </div>
         <div className="space-y-2">
-          <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Selling Price ₹ *</label>
+          <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Cost Price ₹ *</label>
           <input type="number" required min="0" step="0.01" className="w-full p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-indigo-600 dark:text-indigo-400 font-bold text-lg"
-            value={form.sellingPrice} onChange={e => setForm({ ...form, sellingPrice: e.target.value })} />
-        </div>
-        <div className="space-y-2">
-          <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Cost Price ₹</label>
-          <input type="number" min="0" step="0.01" className="w-full p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-500 font-bold text-sm"
             value={form.costPrice} onChange={e => setForm({ ...form, costPrice: e.target.value })} />
         </div>
         <div className="space-y-2">
           <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">GST %</label>
           <input type="number" min="0" max="100" className="w-full p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white font-bold text-sm"
             value={form.gstPercent} onChange={e => setForm({ ...form, gstPercent: e.target.value })} />
+        </div>
+        <div className="space-y-2">
+          <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Selling Price (Auto) ₹</label>
+          <div className="w-full p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 text-slate-500 font-bold text-lg flex items-center h-[60px]">
+            {((parseFloat(form.costPrice || '0')) * (1 + (parseFloat(form.gstPercent || '0') / 100))).toFixed(2)}
+          </div>
         </div>
         <div className="space-y-2">
           <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Initial Stock</label>
