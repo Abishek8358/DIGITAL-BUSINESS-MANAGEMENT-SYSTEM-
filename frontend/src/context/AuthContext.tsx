@@ -2,11 +2,11 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import api from '../services/api';
 
 interface User {
-  id: number;
+  id: string;
   email: string;
   role: 'admin' | 'owner' | 'employee' | 'manager' | 'sales' | 'helper';
   name: string;
-  store_id: number;
+  store_id: string;
 }
 
 interface AuthContextType {

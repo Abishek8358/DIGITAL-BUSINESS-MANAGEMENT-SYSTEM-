@@ -10,5 +10,18 @@
     "skipLibCheck": true,
     "resolveJsonModule": true
   },
-  "include": ["**/*.ts"]
+  "include": ["**/*.ts"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "diagnose-*.ts",
+    "check-*.ts",
+    "fix-*.ts",
+    "migrate-*.ts",
+    "migrate.ts",
+    "repair-*.ts",
+    "test-*.ts",
+    "update-*.ts",
+    "utils/resetDatabase.ts"
+  ]
 }
