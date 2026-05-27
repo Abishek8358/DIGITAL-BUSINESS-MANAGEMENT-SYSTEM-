@@ -63,12 +63,6 @@ export default function LandingPage() {
             ))}
             <div className="flex items-center gap-4 border-l border-slate-200 dark:border-slate-800 pl-8 ml-2">
               <button 
-                onClick={toggleDarkMode}
-                className="p-2.5 bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-500 hover:text-indigo-600 transition-all active:scale-95"
-              >
-                {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-              </button>
-              <button 
                 onClick={() => navigate('/login')}
                 className="text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-indigo-600 transition-colors uppercase tracking-widest px-4"
               >

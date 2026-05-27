@@ -8,21 +8,14 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [darkMode, setDarkMode] = useState(() => {
-    const saved = localStorage.getItem('darkMode');
-    return saved ? JSON.parse(saved) : false;
-  });
+  // Force white theme/light mode as requested by the user
+  const darkMode = false;
+  const toggleDarkMode = () => {};
 
   useEffect(() => {
-    localStorage.setItem('darkMode', JSON.stringify(darkMode));
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [darkMode]);
-
-  const toggleDarkMode = () => setDarkMode(!darkMode);
+    localStorage.setItem('darkMode', 'false');
+    document.documentElement.classList.remove('dark');
+  }, []);
 
   return (
     <ThemeContext.Provider value={{ darkMode, toggleDarkMode }}>

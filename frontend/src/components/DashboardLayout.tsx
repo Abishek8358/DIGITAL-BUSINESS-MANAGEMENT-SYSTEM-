@@ -186,13 +186,6 @@ export default function DashboardLayout() {
           </div>
 
           <div className="flex items-center gap-4">
-            <button
-              onClick={toggleDarkMode}
-              className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-500 transition-all hover:text-indigo-600 shadow-sm"
-            >
-              {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
-
             <div className="h-8 w-[1px] bg-slate-200 dark:bg-slate-800 hidden md:block mx-2" />
 
             <div className="flex items-center gap-2.5 bg-indigo-600 px-5 py-2.5 rounded-xl text-[10px] font-black text-white uppercase tracking-widest hidden md:flex shadow-lg shadow-indigo-600/20 active:scale-95 transition-all">
