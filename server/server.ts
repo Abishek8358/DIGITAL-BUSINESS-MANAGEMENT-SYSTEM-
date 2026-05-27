@@ -21,6 +21,7 @@ import analyticsRoutes from './routes/analyticsRoutes';
 import complaintRoutes from './routes/complaintRoutes';
 import employeeRoutes from './routes/employeeRoutes';
 import settingsRoutes from './routes/settingsRoutes';
+import variantRoutes from './routes/variantRoutes';
 
 dotenv.config({ override: true });
 
@@ -51,6 +52,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/store', storeRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/variants', variantRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/sales', saleRoutes);
 app.use('/api', analyticsRoutes); // stats endpoints mount on /api directly
