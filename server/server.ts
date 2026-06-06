@@ -212,9 +212,9 @@ const verifyAdminAccount = async () => {
 };
 // ────────────────────────────────────────────────────────────────────────────
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production' || process.env.RENDER || !process.env.VERCEL) {
   app.listen(PORT, () => {
-    console.log(`[Server] ✅ Running on http://localhost:${PORT}`);
+    console.log(`[Server] ✅ Running on port ${PORT}`);
   });
 }
 
