@@ -1,8 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
-import { LogIn, User, Lock, ArrowLeft, Eye, EyeOff, Layout, ShieldCheck, Loader2 } from 'lucide-react';
+import {
+  LogIn, User, Lock, ArrowLeft, Eye, EyeOff,
+  Layout, ShieldCheck, Loader2, Zap, Copy, Check
+} from 'lucide-react';
+
+interface DemoInfo {
+  enabled: boolean;
+  admin?: { email: string; password: string; role: string };
+  employee?: { email: string; password: string; role: string };
+  note?: string;
+}
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -11,9 +21,36 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [demoInfo, setDemoInfo] = useState<DemoInfo | null>(null);
+  const [copied, setCopied] = useState<'email' | 'password' | null>(null);
+  const [demoFilled, setDemoFilled] = useState(false);
 
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  // Fetch demo info from backend on mount
+  useEffect(() => {
+    api.get('/api/auth/demo-info')
+      .then(res => setDemoInfo(res.data))
+      .catch(() => setDemoInfo({ enabled: false }));
+  }, []);
+
+  const handleUseDemoLogin = () => {
+    if (!demoInfo?.admin) return;
+    setEmail(demoInfo.admin.email);
+    setPassword(demoInfo.admin.password);
+    setRole('admin');
+    setDemoFilled(true);
+    setTimeout(() => setDemoFilled(false), 2000);
+  };
+
+  const handleCopy = (type: 'email' | 'password') => {
+    const text = type === 'email' ? demoInfo?.admin?.email : demoInfo?.admin?.password;
+    if (!text) return;
+    navigator.clipboard.writeText(text);
+    setCopied(type);
+    setTimeout(() => setCopied(null), 2000);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,14 +58,14 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const res = await api.post('/api/auth/login', { email, password, role });
-      
+
       login(res.data.token, res.data.user);
-      
+
       const tokenHeader = { headers: { Authorization: `Bearer ${res.data.token}` } };
       const categoriesRes = await api.get('/api/categories', tokenHeader);
-      
+
       const isAdmin = ['admin', 'owner'].includes(res.data.user.role);
-      
+
       if (isAdmin && categoriesRes.data.length === 0) {
         navigate('/setup');
       } else {
@@ -43,9 +80,9 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-6 selection:bg-indigo-500/30">
-      
+
       {/* Back Link */}
-      <button 
+      <button
         onClick={() => navigate('/')}
         className="mb-10 flex items-center gap-2 text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-xs uppercase tracking-widest px-6 py-2.5 rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md"
       >
@@ -53,7 +90,7 @@ export default function LoginPage() {
       </button>
 
       <div className="max-w-md w-full bg-white dark:bg-slate-900 rounded-[3rem] border border-slate-200 dark:border-slate-800 overflow-hidden shadow-2xl animate-in zoom-in-95 duration-500">
-        
+
         {/* Header Visual */}
         <div className="p-10 pb-4 text-center">
           <div className="flex items-center justify-center gap-3 mb-8">
@@ -66,11 +103,88 @@ export default function LoginPage() {
           <p className="text-sm font-medium text-slate-500 mt-1">Sign in to manage your store and inventory</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-10 pt-6 space-y-8">
+        <form onSubmit={handleSubmit} className="p-10 pt-6 space-y-6">
+
+          {/* ── Demo Credentials Panel ───────────────────────────────────── */}
+          {demoInfo?.enabled && (
+            <div className="rounded-2xl border-2 border-dashed border-amber-300 dark:border-amber-600 bg-amber-50 dark:bg-amber-950/30 overflow-hidden">
+              {/* Panel Header */}
+              <div className="flex items-center justify-between px-4 py-3 bg-amber-100 dark:bg-amber-900/40 border-b border-amber-200 dark:border-amber-700">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-full bg-amber-400 dark:bg-amber-500 flex items-center justify-center">
+                    <Zap className="w-3.5 h-3.5 text-white" />
+                  </div>
+                  <span className="text-xs font-black text-amber-800 dark:text-amber-300 uppercase tracking-widest">Demo Credentials</span>
+                </div>
+                <span className="text-[9px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider bg-amber-200 dark:bg-amber-800 px-2 py-0.5 rounded-full">
+                  {demoInfo.note}
+                </span>
+              </div>
+
+              {/* Credentials Grid */}
+              <div className="px-4 py-3 space-y-2">
+                {/* Email Row */}
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <p className="text-[9px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-0.5">Email</p>
+                    <p className="text-xs font-mono font-bold text-amber-900 dark:text-amber-200">{demoInfo.admin?.email}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleCopy('email')}
+                    className="p-1.5 rounded-lg text-amber-500 hover:text-amber-700 dark:hover:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-800 transition-all"
+                    title="Copy email"
+                  >
+                    {copied === 'email' ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+                  </button>
+                </div>
+
+                {/* Divider */}
+                <div className="border-t border-amber-200 dark:border-amber-700" />
+
+                {/* Password Row */}
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <p className="text-[9px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-0.5">Password</p>
+                    <p className="text-xs font-mono font-bold text-amber-900 dark:text-amber-200">{demoInfo.admin?.password}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleCopy('password')}
+                    className="p-1.5 rounded-lg text-amber-500 hover:text-amber-700 dark:hover:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-800 transition-all"
+                    title="Copy password"
+                  >
+                    {copied === 'password' ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+                  </button>
+                </div>
+
+                {/* Use Demo Button */}
+                <button
+                  type="button"
+                  id="use-demo-login-btn"
+                  onClick={handleUseDemoLogin}
+                  className={`
+                    mt-1 w-full py-2.5 rounded-xl text-xs font-black uppercase tracking-widest
+                    transition-all duration-300 flex items-center justify-center gap-2
+                    ${demoFilled
+                      ? 'bg-green-500 text-white shadow-lg shadow-green-500/20'
+                      : 'bg-amber-400 hover:bg-amber-500 dark:bg-amber-500 dark:hover:bg-amber-400 text-amber-900 shadow-lg shadow-amber-400/20 active:scale-95'}
+                  `}
+                >
+                  {demoFilled ? (
+                    <><Check className="w-4 h-4" /> Fields Auto-Filled!</>
+                  ) : (
+                    <><Zap className="w-4 h-4" /> Use Demo Login</>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+          {/* ──────────────────────────────────────────────────────────────── */}
 
           {error && (
             <div className="bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 p-4 rounded-2xl text-xs font-bold uppercase tracking-wider border border-red-100 dark:border-red-900/30 flex items-center gap-3 animate-in shake duration-300">
-               <ShieldCheck className="w-5 h-5 opacity-50" /> {error}
+              <ShieldCheck className="w-5 h-5 opacity-50" /> {error}
             </div>
           )}
 
@@ -97,46 +211,49 @@ export default function LoginPage() {
 
           <div className="space-y-6">
             <div className="space-y-2">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] ml-1">Email Address</label>
-                <div className="relative group">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] ml-1">Email Address</label>
+              <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-lg group-focus-within:bg-indigo-50 dark:group-focus-within:bg-indigo-950/30 transition-colors">
-                    <User className="w-4 h-4 text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
+                  <User className="w-4 h-4 text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
                 </div>
                 <input
-                    type="email" required
-                    className="w-full pl-16 pr-4 py-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-indigo-500/5 text-slate-900 dark:text-white font-bold text-sm outline-none transition-all shadow-inner"
-                    placeholder="name@store.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                  id="login-email"
+                  type="email" required
+                  className="w-full pl-16 pr-4 py-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-indigo-500/5 text-slate-900 dark:text-white font-bold text-sm outline-none transition-all shadow-inner"
+                  placeholder="name@store.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
-                </div>
+              </div>
             </div>
 
             <div className="space-y-2">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] ml-1">Password</label>
-                <div className="relative group">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] ml-1">Password</label>
+              <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-lg group-focus-within:bg-indigo-50 dark:group-focus-within:bg-indigo-950/30 transition-colors">
-                    <Lock className="w-4 h-4 text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
+                  <Lock className="w-4 h-4 text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
                 </div>
                 <input
-                    type={showPassword ? "text" : "password"} required
-                    className="w-full pl-16 pr-12 py-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-indigo-500/5 text-slate-900 dark:text-white font-bold text-sm outline-none transition-all shadow-inner"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                  id="login-password"
+                  type={showPassword ? "text" : "password"} required
+                  className="w-full pl-16 pr-12 py-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-indigo-500/5 text-slate-900 dark:text-white font-bold text-sm outline-none transition-all shadow-inner"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
                 <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-lg text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-lg text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                 >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
-                </div>
+              </div>
             </div>
           </div>
 
           <button
+            id="login-submit-btn"
             type="submit"
             disabled={loading}
             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-5 rounded-2xl font-bold uppercase tracking-widest transition-all shadow-xl shadow-indigo-600/20 active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50"
