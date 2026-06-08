@@ -53,8 +53,8 @@ function VariantRow({ variant, onRefresh, isAdmin }: any) {
 
   if (editing) {
     return (
-      <div className="ml-8 p-6 bg-slate-50 dark:bg-slate-950 rounded-3xl border border-slate-200 dark:border-slate-800 space-y-6 animate-in fade-in duration-300 shadow-inner">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <div className="ml-2 sm:ml-8 p-4 sm:p-6 bg-slate-50 dark:bg-slate-950 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 space-y-4 sm:space-y-6 animate-in fade-in duration-300 shadow-inner">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Variant Name</label>
             <input className="w-full p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm font-bold shadow-sm outline-none focus:ring-4 focus:ring-indigo-500/5"
@@ -98,11 +98,11 @@ function VariantRow({ variant, onRefresh, isAdmin }: any) {
         </div>
         <div className="flex gap-3 pt-2">
           <button onClick={handleSave} disabled={saving}
-            className="flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider disabled:opacity-50 shadow-lg shadow-indigo-600/20 active:scale-95 transition-all">
+            className="flex items-center gap-2 px-4 sm:px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider disabled:opacity-50 shadow-lg shadow-indigo-600/20 active:scale-95 transition-all">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />} Save Changes
           </button>
           <button onClick={() => setEditing(false)}
-            className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-slate-900 text-slate-500 rounded-xl text-xs font-bold uppercase tracking-wider hover:text-slate-900 dark:hover:text-white transition-all border border-slate-200 dark:border-slate-800 shadow-sm">
+            className="flex items-center gap-2 px-4 sm:px-6 py-3 bg-white dark:bg-slate-900 text-slate-500 rounded-xl text-xs font-bold uppercase tracking-wider hover:text-slate-900 dark:hover:text-white transition-all border border-slate-200 dark:border-slate-800 shadow-sm">
              Cancel
           </button>
         </div>
@@ -156,20 +156,20 @@ function VariantRow({ variant, onRefresh, isAdmin }: any) {
         </div>
       )}
 
-      <div className="flex items-center gap-4 px-6 py-4 ml-8 bg-white dark:bg-slate-900 rounded-2xl group transition-all border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-indigo-100 dark:hover:border-indigo-900/40">
-        <div className={`w-2 h-2 rounded-full ${variant.stock <= variant.minimumStock ? 'bg-red-500 animate-pulse' : 'bg-slate-200 dark:bg-slate-700'}`} />
-        <span className="flex-1 text-sm font-bold text-slate-700 dark:text-slate-300">{variant.variantName}</span>
-        <div className="flex items-center gap-4">
-            <span className="text-indigo-600 dark:text-indigo-400 font-bold text-sm">₹{Number(variant.sellingPrice).toLocaleString()}</span>
-            <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border ${variant.stock <= variant.minimumStock ? 'bg-red-50 text-red-600 border-red-100' : 'bg-slate-50 dark:bg-slate-950 text-slate-500 border-slate-200 dark:border-slate-800'}`}>
+      <div className="flex items-center gap-3 sm:gap-4 px-4 py-3 sm:px-6 sm:py-4 ml-2 sm:ml-8 bg-white dark:bg-slate-900 rounded-2xl group transition-all border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-indigo-100 dark:hover:border-indigo-900/40">
+        <div className={`w-2 h-2 rounded-full shrink-0 ${variant.stock <= variant.minimumStock ? 'bg-red-500 animate-pulse' : 'bg-slate-200 dark:bg-slate-700'}`} />
+        <span className="flex-1 text-sm font-bold text-slate-700 dark:text-slate-300 truncate">{variant.variantName}</span>
+        <div className="flex items-center gap-2 sm:gap-4">
+            <span className="text-indigo-600 dark:text-indigo-400 font-bold text-sm shrink-0">₹{Number(variant.sellingPrice).toLocaleString()}</span>
+            <span className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-widest px-2 sm:px-3 py-1 rounded-full border shrink-0 ${variant.stock <= variant.minimumStock ? 'bg-red-50 text-red-600 border-red-100' : 'bg-slate-50 dark:bg-slate-950 text-slate-500 border-slate-200 dark:border-slate-800'}`}>
               {variant.stock} Items
             </span>
         </div>
         {isAdmin && (
-          <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all">
-            <button onClick={() => setAddStockOpen(true)} className="p-2 bg-emerald-50 text-emerald-600 dark:bg-emerald-950/20 rounded-xl transition-all hover:scale-110" title="Add Stock"><PackagePlus className="w-4 h-4" /></button>
-            <button onClick={() => setEditing(true)} className="p-2 bg-indigo-50 text-indigo-600 dark:bg-indigo-950/20 rounded-xl transition-all hover:scale-110" title="Edit"><Edit2 className="w-4 h-4" /></button>
-            <button onClick={handleDelete} className="p-2 bg-red-50 text-red-600 dark:bg-red-950/20 rounded-xl transition-all hover:scale-110" title="Delete"><Trash2 className="w-4 h-4" /></button>
+          <div className="flex gap-1 sm:gap-1.5 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all shrink-0">
+            <button onClick={() => setAddStockOpen(true)} className="p-1.5 sm:p-2 bg-emerald-50 text-emerald-600 dark:bg-emerald-950/20 rounded-xl transition-all hover:scale-110 cursor-pointer" title="Add Stock"><PackagePlus className="w-3.5 h-3.5 sm:w-4 sm:h-4" /></button>
+            <button onClick={() => setEditing(true)} className="p-1.5 sm:p-2 bg-indigo-50 text-indigo-600 dark:bg-indigo-950/20 rounded-xl transition-all hover:scale-110 cursor-pointer" title="Edit"><Edit2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" /></button>
+            <button onClick={handleDelete} className="p-1.5 sm:p-2 bg-red-50 text-red-600 dark:bg-red-950/20 rounded-xl transition-all hover:scale-110 cursor-pointer" title="Delete"><Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" /></button>
           </div>
         )}
       </div>
@@ -192,11 +192,11 @@ function AddVariantForm({ brandId, onDone }: any) {
     finally { setLoading(false); }
   };
   return (
-    <form onSubmit={handleSubmit} className="ml-10 mt-4 p-8 bg-white dark:bg-slate-900 rounded-[2.5rem] border border-dashed border-indigo-200 dark:border-indigo-900/40 space-y-8 animate-in slide-in-from-top-4 duration-300 shadow-xl">
+    <form onSubmit={handleSubmit} className="ml-2 sm:ml-10 mt-4 p-4 sm:p-8 bg-white dark:bg-slate-900 rounded-2xl sm:rounded-[2.5rem] border border-dashed border-indigo-200 dark:border-indigo-900/40 space-y-6 sm:space-y-8 animate-in slide-in-from-top-4 duration-300 shadow-xl">
       <div className="flex items-center gap-3">
           <p className="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">New Variant Details</p>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
         <div className="md:col-span-3 space-y-2">
           <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Variant Name *</label>
           <input required placeholder="E.g. 8GB, 128GB, Red" className="w-full p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white font-bold text-sm outline-none"
@@ -266,26 +266,26 @@ function BrandRow({ brand, onRefresh, isAdmin }: any) {
   const variantCount = brand.variants?.length || 0;
 
   return (
-    <div className="ml-10 border-l-2 border-slate-100 dark:border-slate-800 pl-6 space-y-3">
+    <div className="ml-2 sm:ml-10 border-l-2 border-slate-100 dark:border-slate-800 pl-3 sm:pl-6 space-y-3">
       <div
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-4 py-3.5 px-6 rounded-[1.5rem] cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/40 group transition-all relative border border-transparent shadow-sm hover:shadow-md hover:border-slate-200 dark:hover:border-slate-800"
+        className="flex items-center gap-3 sm:gap-4 py-2.5 sm:py-3.5 px-4 sm:px-6 rounded-xl sm:rounded-[1.5rem] cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/40 group transition-all relative border border-transparent shadow-sm hover:shadow-md hover:border-slate-200 dark:hover:border-slate-800"
       >
-        <div className={`absolute left-[-26px] top-1/2 w-4 h-[2px] bg-slate-100 dark:bg-slate-800`} />
-        {open ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />}
-        <Layers className="w-4.5 h-4.5 text-indigo-500 dark:text-indigo-400" />
-        <span className="text-sm font-bold text-slate-700 dark:text-slate-200 group-hover:text-indigo-600 transition-colors uppercase tracking-tight">{brand.name}</span>
-        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">{variantCount} Variant{variantCount !== 1 ? 's' : ''}</span>
-        <div className="ml-auto flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
+        <div className="hidden sm:block absolute left-[-26px] top-1/2 w-4 h-[2px] bg-slate-100 dark:bg-slate-800" />
+        {open ? <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" /> : <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />}
+        <Layers className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-indigo-500 dark:text-indigo-400 shrink-0" />
+        <span className="text-sm font-bold text-slate-700 dark:text-slate-200 group-hover:text-indigo-600 transition-colors uppercase tracking-tight truncate flex-1">{brand.name}</span>
+        <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 shrink-0">{variantCount} Variant{variantCount !== 1 ? 's' : ''}</span>
+        <div className="ml-auto flex gap-1.5 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all shrink-0">
           {isAdmin && (
             <>
               <button onClick={e => { e.stopPropagation(); setAddingVariant(true); setOpen(true); }}
-                className="flex items-center gap-2 px-4 py-2 text-indigo-600 bg-indigo-50 dark:bg-indigo-500/10 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-500/20 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-100 transition-all">
+                className="flex items-center gap-1.5 px-3 py-1.5 text-indigo-600 bg-indigo-50 dark:bg-indigo-500/10 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-500/20 rounded-xl text-[9px] sm:text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-100 transition-all cursor-pointer">
                 <Plus className="w-3 h-3" /> Add Variant
               </button>
               <button onClick={e => { e.stopPropagation(); handleDeleteBrand(); }}
-                className="p-2 bg-red-50 dark:bg-red-950/20 text-red-600 rounded-xl hover:bg-red-100 transition-all shadow-sm">
-                <Trash2 className="w-4 h-4" />
+                className="p-1.5 sm:p-2 bg-red-50 dark:bg-red-950/20 text-red-600 rounded-xl hover:bg-red-100 transition-all shadow-sm cursor-pointer">
+                <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
             </>
           )}
@@ -339,54 +339,54 @@ function ProductCard({ product, onRefresh, isAdmin }: any) {
   const totalVariants = product.brands?.reduce((sum: number, b: any) => sum + (b.variants?.length || 0), 0) || 0;
 
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] overflow-hidden group/card shadow-sm hover:shadow-xl hover:border-indigo-100 dark:hover:border-indigo-900/30 transition-all duration-500">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-[2.5rem] overflow-hidden group/card shadow-sm hover:shadow-xl hover:border-indigo-100 dark:hover:border-indigo-900/30 transition-all duration-500">
       <div
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-6 p-6 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-all group"
+        className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 p-4 sm:p-6 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-all group"
       >
-        <div className="w-20 h-20 rounded-[1.5rem] overflow-hidden flex-shrink-0 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 shadow-md group-hover:scale-105 transition-transform duration-500">
+        <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-xl sm:rounded-[1.5rem] overflow-hidden flex-shrink-0 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 shadow-md group-hover:scale-105 transition-transform duration-500">
           <img src={product.imageUrl || DEFAULT_IMG} alt={product.name}
             className="w-full h-full object-cover"
             onError={(e: any) => { e.target.src = DEFAULT_IMG; }} />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-3">
-            {open ? <ChevronDown className="w-5 h-5 text-indigo-600" /> : <ChevronRight className="w-5 h-5 text-slate-400" />}
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white truncate tracking-tight">{product.name}</h3>
+          <div className="flex items-center gap-2 sm:gap-3">
+            {open ? <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600 shrink-0" /> : <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400 shrink-0" />}
+            <h3 className="text-base sm:text-xl font-bold text-slate-900 dark:text-white truncate tracking-tight">{product.name}</h3>
           </div>
-          <div className="flex items-center gap-3 ml-8 mt-1">
-            <span className="text-[10px] font-bold bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-3 py-1 rounded-full uppercase tracking-widest border border-indigo-100 dark:border-indigo-900/30">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 ml-6 sm:ml-8 mt-1.5 sm:mt-1">
+            <span className="text-[9px] sm:text-[10px] font-bold bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full uppercase tracking-widest border border-indigo-100 dark:border-indigo-900/30">
               {product.categoryName || 'General'}
             </span>
-            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+            <div className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                 {product.brands?.length || 0} Brands &bull; {totalVariants} Variants
             </div>
           </div>
         </div>
         {isAdmin && (
-          <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-all">
+          <div className="flex items-center gap-2 sm:gap-3 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all w-full sm:w-auto mt-3 sm:mt-0 pt-3 sm:pt-0 border-t border-slate-100 dark:border-slate-800 sm:border-none">
             <button
                onClick={e => { e.stopPropagation(); setAddingBrand(true); setOpen(true); }}
-               className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2 px-6 py-3.5 rounded-2xl text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-indigo-600/20 active:scale-95 transition-all"
+               className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center gap-1.5 px-4 sm:px-6 py-2.5 sm:py-3.5 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-indigo-600/20 active:scale-95 transition-all flex-1 sm:flex-none cursor-pointer"
              >
-               <Plus className="w-4 h-4" /> Add Brand
+               <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> Add Brand
              </button>
             <button onClick={e => { e.stopPropagation(); handleDeleteProduct(); }}
-              className="p-3 bg-red-50 dark:bg-red-950/20 text-red-600 rounded-2xl hover:bg-red-100 transition-all shadow-sm">
-              <Trash2 className="w-5 h-5" />
+              className="p-2.5 sm:p-3 bg-red-50 dark:bg-red-950/20 text-red-600 rounded-xl sm:rounded-2xl hover:bg-red-100 transition-all shadow-sm cursor-pointer">
+              <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           </div>
         )}
       </div>
 
       {open && (
-        <div className="px-10 pb-10 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
-          <div className="h-px w-full bg-slate-100 dark:bg-slate-800 mb-6" />
+        <div className="px-4 sm:px-10 pb-4 sm:pb-10 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="h-px w-full bg-slate-100 dark:bg-slate-800 mb-4 sm:mb-6" />
           
           {product.brands?.length === 0 && !addingBrand && (
-            <div className="flex flex-col items-center justify-center p-12 text-slate-400 animate-in fade-in duration-500">
-               <Layers className="w-12 h-12 mb-4 opacity-20" />
-               <p className="text-xs font-bold uppercase tracking-widest opacity-50">No brands configured for this product</p>
+            <div className="flex flex-col items-center justify-center p-8 sm:p-12 text-slate-400 animate-in fade-in duration-500">
+               <Layers className="w-10 h-10 sm:w-12 sm:h-12 mb-4 opacity-20" />
+               <p className="text-[10px] sm:text-xs font-bold uppercase tracking-widest opacity-50 text-center">No brands configured for this product</p>
             </div>
           )}
           {product.brands?.map((brand: any) => (
@@ -395,30 +395,30 @@ function ProductCard({ product, onRefresh, isAdmin }: any) {
 
           {isAdmin && (
             addingBrand ? (
-              <div className="ml-14 mt-6 flex items-center gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="ml-4 sm:ml-14 mt-4 sm:mt-6 flex items-center gap-2 sm:gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
                 <div className="flex-1 relative">
-                    <Layers className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-indigo-500" />
+                    <Layers className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-indigo-500" />
                     <input
                       autoFocus type="text" placeholder="Enter brand name (e.g. Apple, Samsung)"
-                      className="w-full pl-14 pr-4 py-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold text-slate-900 dark:text-white shadow-inner outline-none focus:ring-4 focus:ring-indigo-500/5 transition-all"
+                      className="w-full pl-10 sm:pl-14 pr-4 py-3 sm:py-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold text-slate-900 dark:text-white shadow-inner outline-none focus:ring-4 focus:ring-indigo-500/5 transition-all"
                       value={newBrandName} onChange={e => setNewBrandName(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && handleAddBrand()}
                     />
                 </div>
                 <button onClick={handleAddBrand} disabled={addingBrandLoading}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4.5 rounded-2xl text-xs font-bold uppercase tracking-widest shadow-lg shadow-indigo-600/20 active:scale-95 transition-all flex items-center gap-2">
-                  {addingBrandLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />} Save
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 sm:px-8 py-3 sm:py-4.5 rounded-xl sm:rounded-2xl text-[10px] sm:text-xs font-bold uppercase tracking-widest shadow-lg shadow-indigo-600/20 active:scale-95 transition-all flex items-center gap-1.5 sm:gap-2 shrink-0 cursor-pointer">
+                  {addingBrandLoading ? <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" /> : <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} Save
                 </button>
                 <button onClick={() => setAddingBrand(false)}
-                  className="p-4 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-2xl hover:text-red-500 transition-all">
-                  <X className="w-6 h-6" />
+                  className="p-3 sm:p-4 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-xl sm:rounded-2xl hover:text-red-500 transition-all cursor-pointer">
+                  <X className="w-4 h-4 sm:w-6 sm:h-6" />
                 </button>
               </div>
             ) : (
               <button onClick={() => setAddingBrand(true)}
-                className="flex items-center gap-3 ml-14 mt-4 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 transition-colors uppercase tracking-widest group">
-                <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Plus className="w-4 h-4" />
+                className="flex items-center gap-2 sm:gap-3 ml-4 sm:ml-14 mt-4 text-[10px] sm:text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 transition-colors uppercase tracking-widest group border-none bg-transparent cursor-pointer">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </div>
                 Add New Brand
               </button>
@@ -485,9 +485,9 @@ export default function ProductManagement() {
   return (
     <div className="space-y-10 pb-20">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-200 dark:border-slate-800 pb-10">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 border-b border-slate-200 dark:border-slate-800 pb-6 sm:pb-10">
         <div className="space-y-1">
-            <h1 className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
                 Products
             </h1>
             <p className="text-slate-500 font-medium">
@@ -525,8 +525,8 @@ export default function ProductManagement() {
 
       {/* Add Product Modal */}
       {showAddProduct && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white dark:bg-slate-900 rounded-[3rem] border border-slate-200 dark:border-slate-800 w-full max-w-lg overflow-hidden shadow-2xl relative">
+         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-[3rem] border border-slate-200 dark:border-slate-800 w-full max-w-[calc(100vw-2rem)] sm:max-w-lg overflow-hidden shadow-2xl relative max-h-[90vh] overflow-y-auto no-scrollbar">
             <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
                <div>
                   <h3 className="text-2xl font-bold text-slate-900 dark:text-white">Add Product</h3>

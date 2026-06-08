@@ -194,9 +194,9 @@ export default function SettingsPage() {
   return (
     <div className="space-y-10 pb-20">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-200 dark:border-slate-800 pb-10">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 border-b border-slate-200 dark:border-slate-800 pb-6 sm:pb-10">
         <div className="space-y-1">
-          <h1 className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
             Settings
           </h1>
           <p className="text-slate-500 font-medium">
@@ -205,7 +205,7 @@ export default function SettingsPage() {
         </div>
 
         {message.text && (
-          <div className={`px-6 py-4 rounded-2xl border flex items-center gap-3 animate-in fade-in slide-in-from-right-10 duration-500 shadow-lg ${message.type === 'success' ? 'bg-emerald-50 dark:bg-emerald-950 border-emerald-100 dark:border-emerald-900 text-emerald-600 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-950 border-red-100 dark:border-red-900 text-red-600 dark:text-red-400'
+          <div className={`px-5 py-3.5 sm:px-6 sm:py-4 rounded-xl sm:rounded-2xl border flex items-center gap-2 sm:gap-3 animate-in fade-in slide-in-from-right-10 duration-500 shadow-lg shrink-0 ${message.type === 'success' ? 'bg-emerald-50 dark:bg-emerald-950 border-emerald-100 dark:border-emerald-900 text-emerald-600 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-950 border-red-100 dark:border-red-900 text-red-600 dark:text-red-400'
             }`}>
             {message.type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
             <span className="text-sm font-bold">{message.text}</span>
@@ -213,37 +213,37 @@ export default function SettingsPage() {
         )}
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-10">
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-10">
         {/* Sidebar Nav */}
         <div className="w-full lg:w-80 flex flex-col gap-3">
           {sections.map((s) => (
             <button
               key={s.id}
               onClick={() => setActiveSection(s.id as Section)}
-              className={`flex items-start gap-4 p-5 rounded-2xl transition-all duration-200 group relative border shadow-sm ${activeSection === s.id
+              className={`flex items-start gap-3 sm:gap-4 p-4 sm:p-5 rounded-xl sm:rounded-2xl transition-all duration-200 group relative border shadow-sm ${activeSection === s.id
                   ? 'bg-indigo-600 border-indigo-600 text-white shadow-indigo-600/20'
                   : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500'
                 }`}
             >
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${activeSection === s.id ? 'bg-white/20 text-white' : 'bg-slate-50 dark:bg-slate-950 text-indigo-600 dark:text-indigo-400'
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all shrink-0 ${activeSection === s.id ? 'bg-white/20 text-white' : 'bg-slate-50 dark:bg-slate-950 text-indigo-600 dark:text-indigo-400'
                 }`}>
                 <s.icon className="w-5 h-5" />
               </div>
-              <div className="flex-1 text-left">
-                <p className={`text-sm font-bold ${activeSection === s.id ? 'text-white' : 'text-slate-900 dark:text-white'}`}>{s.name}</p>
-                <p className={`text-xs mt-0.5 ${activeSection === s.id ? 'text-indigo-100' : 'text-slate-500'}`}>{s.desc}</p>
+              <div className="flex-1 text-left min-w-0">
+                <p className={`text-sm font-bold ${activeSection === s.id ? 'text-white' : 'text-slate-900 dark:text-white'} truncate`}>{s.name}</p>
+                <p className={`text-xs mt-0.5 ${activeSection === s.id ? 'text-indigo-100' : 'text-slate-500'} truncate`}>{s.desc}</p>
               </div>
-              {activeSection === s.id && <ChevronRight className="w-4 h-4 text-white mt-1.5" />}
+              {activeSection === s.id && <ChevronRight className="w-4 h-4 text-white mt-1.5 shrink-0" />}
             </button>
           ))}
         </div>
 
         {/* Form Area */}
         <div className="flex-1">
-          <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden min-h-[500px]">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden min-h-[500px]">
 
             {activeSection === 'profile' && (
-              <form onSubmit={handleUpdateProfile} className="p-10 space-y-10 animate-in fade-in duration-300">
+              <form onSubmit={handleUpdateProfile} className="p-4 sm:p-10 space-y-6 sm:space-y-10 animate-in fade-in duration-300">
                 <div className="flex flex-col sm:flex-row items-center gap-8">
                   <div className="relative group/logo">
                     <div className="w-32 h-32 bg-slate-50 dark:bg-slate-950 rounded-[2rem] flex items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 group-hover/logo:border-indigo-500 transition-all overflow-hidden shadow-inner">
@@ -348,7 +348,7 @@ export default function SettingsPage() {
             )}
 
             {activeSection === 'billing' && (
-              <form onSubmit={handleUpdateBilling} className="p-10 space-y-10 animate-in fade-in duration-300">
+              <form onSubmit={handleUpdateBilling} className="p-4 sm:p-10 space-y-6 sm:space-y-10 animate-in fade-in duration-300">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Currency Symbol</label>
@@ -380,7 +380,7 @@ export default function SettingsPage() {
             )}
 
             {activeSection === 'inventory' && (
-              <form onSubmit={handleUpdateInventory} className="p-10 space-y-10 animate-in fade-in duration-300">
+              <form onSubmit={handleUpdateInventory} className="p-4 sm:p-10 space-y-6 sm:space-y-10 animate-in fade-in duration-300">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="p-6 bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900 rounded-3xl space-y-4">
                     <div className="flex items-center gap-3">
@@ -415,7 +415,7 @@ export default function SettingsPage() {
 
 
             {activeSection === 'security' && (
-              <form onSubmit={handleUpdatePassword} className="p-10 space-y-10 animate-in fade-in duration-300">
+              <form onSubmit={handleUpdatePassword} className="p-4 sm:p-10 space-y-6 sm:space-y-10 animate-in fade-in duration-300">
                 <div className="space-y-6 max-w-sm">
                   {[
                     { l: 'Current Password', v: securityData.currentPassword, k: 'currentPassword' },

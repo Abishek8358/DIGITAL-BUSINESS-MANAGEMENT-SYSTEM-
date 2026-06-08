@@ -100,9 +100,9 @@ export default function EmployeeManagement() {
   return (
     <div className="space-y-10 pb-20">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-200 dark:border-slate-800 pb-10">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 border-b border-slate-200 dark:border-slate-800 pb-6 sm:pb-10">
         <div className="space-y-1">
-            <h1 className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
                 Employee Management
             </h1>
             <p className="text-slate-500 font-medium">
@@ -111,15 +111,15 @@ export default function EmployeeManagement() {
         </div>
         <button 
           onClick={() => handleOpenModal()}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-2xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-indigo-600/20 transition-all active:scale-95"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3.5 sm:px-8 sm:py-4 rounded-xl sm:rounded-2xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20 transition-all active:scale-95 cursor-pointer"
         >
           <Plus className="w-5 h-5" /> Add Employee
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
         {employees.map(emp => (
-          <div key={emp.id} className={`bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border transition-all duration-300 relative overflow-hidden shadow-sm ${
+          <div key={emp.id} className={`bg-white dark:bg-slate-900 p-4 sm:p-8 rounded-2xl sm:rounded-[2.5rem] border transition-all duration-300 relative overflow-hidden shadow-sm ${
             emp.status === 'inactive' ? 'opacity-60 grayscale' : 'border-slate-200 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-900/40 hover:shadow-xl'
           }`}>
             <div className="flex items-center gap-6 mb-8">
@@ -200,7 +200,7 @@ export default function EmployeeManagement() {
 
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden shadow-2xl relative">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-[calc(100vw-2rem)] sm:max-w-lg rounded-2xl sm:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden shadow-2xl relative max-h-[90vh] overflow-y-auto no-scrollbar">
             <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
                <div>
                   <h3 className="text-xl font-bold text-slate-900 dark:text-white">{editingEmployee ? 'Edit Employee' : 'Add New Employee'}</h3>

@@ -81,25 +81,25 @@ export default function ReportsPage() {
   return (
     <div className="space-y-10 pb-20">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-200 dark:border-slate-800 pb-10">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 border-b border-slate-200 dark:border-slate-800 pb-6 sm:pb-10">
         <div className="space-y-1">
-            <h1 className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
                 Analytics & Insights
             </h1>
             <p className="text-slate-500 font-medium">
                 View detailed reports of your store performance.
             </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 w-full sm:w-auto">
           <button 
             onClick={fetchData}
-            className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-indigo-600 transition-all shadow-sm"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-indigo-600 transition-all shadow-sm cursor-pointer"
           >
             <Calendar className="w-4 h-4" /> Refresh
           </button>
           <button 
             onClick={handleExportPDF}
-            className="flex items-center gap-2 px-8 py-3 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-3.5 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20 cursor-pointer"
           >
             <Download className="w-4 h-4" /> Export PDF
           </button>
@@ -108,31 +108,31 @@ export default function ReportsPage() {
 
       <div ref={reportRef} className="space-y-12">
         {/* Summary Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
             { label: 'Total Revenue', val: `₹${parseFloat(summary.total_revenue).toLocaleString()}`, icon: DollarSign, color: 'text-indigo-600', bg: 'bg-indigo-50' },
             { label: 'Total Profit', val: `₹${parseFloat(summary.total_profit).toLocaleString()}`, icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50' },
             { label: 'Total Orders', val: summary.total_orders, icon: ShoppingBag, color: 'text-blue-600', bg: 'bg-blue-50' },
             { label: 'GST Collected', val: `₹${parseFloat(summary.gst_collected).toLocaleString()}`, icon: Filter, color: 'text-purple-600', bg: 'bg-purple-50' },
           ].map((stat) => (
-            <div key={stat.label} className="bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-200 dark:border-slate-800 relative group overflow-hidden shadow-sm">
-                <div className={`w-12 h-12 rounded-2xl ${stat.bg} flex items-center justify-center mb-6`}>
-                  <stat.icon className={`w-6 h-6 ${stat.color}`} />
+            <div key={stat.label} className="bg-white dark:bg-slate-900 p-5 sm:p-8 rounded-2xl sm:rounded-[2rem] border border-slate-200 dark:border-slate-800 relative group overflow-hidden shadow-sm">
+                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl ${stat.bg} flex items-center justify-center mb-4 sm:mb-6`}>
+                  <stat.icon className={`w-5 h-5 sm:w-6 sm:h-6 ${stat.color}`} />
                 </div>
-                <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">{stat.label}</p>
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{stat.val}</h3>
+                <p className="text-slate-500 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1.5 sm:mb-2">{stat.label}</p>
+                <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{stat.val}</h3>
             </div>
           ))}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Revenue Yearly Chart */}
-          <div className="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm">
-            <div className="flex items-center justify-between mb-10">
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Revenue History</h3>
+          <div className="bg-white dark:bg-slate-900 p-5 sm:p-8 rounded-2xl sm:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm">
+            <div className="flex items-center justify-between mb-6 sm:mb-10">
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white tracking-tight">Revenue History</h3>
                 <Activity className="w-5 h-5 text-indigo-500 opacity-20" />
             </div>
-            <div className="h-80">
+            <div className="h-64 sm:h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <ReBarChart data={yearlyRevenue}>
                   <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#64748b', fontWeight: 700}} />
@@ -151,16 +151,16 @@ export default function ReportsPage() {
           </div>
 
           {/* Category Revenue Chart */}
-          <div className="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm">
-            <div className="flex items-center justify-between mb-10">
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Category Revenue</h3>
+          <div className="bg-white dark:bg-slate-900 p-5 sm:p-8 rounded-2xl sm:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm">
+            <div className="flex items-center justify-between mb-6 sm:mb-10">
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white tracking-tight">Category Revenue</h3>
                 <PieIcon className="w-5 h-5 text-emerald-500 opacity-20" />
             </div>
-            <div className="h-80">
+            <div className="h-64 sm:h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <ReBarChart data={categoryDist} layout="vertical">
                   <XAxis type="number" hide />
-                  <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#64748b', fontWeight: 700}} width={100} />
+                  <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#64748b', fontWeight: 700}} width={80} />
                   <Tooltip 
                     contentStyle={{ backgroundColor: '#fff', border: 'none', borderRadius: '1rem', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
                   />
@@ -172,12 +172,12 @@ export default function ReportsPage() {
         </div>
 
         {/* Top Products Row */}
-        <div className="bg-white dark:bg-slate-900 p-10 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
-          <div className="flex items-center justify-between mb-12">
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Top Products Performance</h3>
+        <div className="bg-white dark:bg-slate-900 p-5 sm:p-10 rounded-2xl sm:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
+          <div className="flex items-center justify-between mb-6 sm:mb-12">
+                <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Top Products Performance</h3>
                 <Zap className="w-6 h-6 text-amber-500 opacity-40" />
           </div>
-          <div className="h-80">
+          <div className="h-64 sm:h-80">
             <ResponsiveContainer width="100%" height="100%">
               <ReBarChart data={topProducts}>
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#64748b', fontWeight: 700}} />
@@ -185,7 +185,7 @@ export default function ReportsPage() {
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#fff', border: 'none', borderRadius: '1rem', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
                 />
-                <Bar dataKey="total_sold" radius={[8, 8, 0, 0]} barSize={60}>
+                <Bar dataKey="total_sold" radius={[8, 8, 0, 0]} barSize={40}>
                   {topProducts.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill="#f59e0b" fillOpacity={0.8} />
                   ))}

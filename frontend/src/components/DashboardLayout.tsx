@@ -177,12 +177,11 @@ export default function DashboardLayout() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 bg-white dark:bg-slate-950 transition-colors duration-300">
         {/* Header */}
-        <header className="h-20 flex items-center justify-between px-6 lg:px-10 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 backdrop-blur-xl sticky top-0 z-40">
+        <header className="h-14 lg:h-20 flex items-center justify-between px-4 lg:px-10 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 backdrop-blur-xl sticky top-0 z-40">
           <div className="flex items-center gap-6">
-            <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden text-slate-500 p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-              <Menu className="w-6 h-6" />
+            <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden text-slate-500 p-1.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+              <Menu className="w-5 h-5" />
             </button>
-
           </div>
 
           <div className="flex items-center gap-4">
@@ -195,12 +194,75 @@ export default function DashboardLayout() {
         </header>
 
         {/* Dash/Pages */}
-        <main className="flex-1 overflow-y-auto p-6 lg:p-10 no-scrollbar">
+        <main className="flex-1 overflow-y-auto p-3 pb-24 sm:p-4 sm:pb-24 lg:p-10 no-scrollbar">
           <div className="max-w-7xl mx-auto">
             <Outlet />
           </div>
         </main>
       </div>
+
+      {/* Mobile Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.05)]">
+        <div className="flex justify-around items-center h-16" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) * 0.4)' }}>
+          {/* Dashboard */}
+          <NavLink
+            to="/admin/dashboard"
+            className={({ isActive }) => `
+              flex flex-col items-center justify-center flex-1 h-full py-2 gap-0.5 text-center
+              ${isActive ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-500 dark:text-slate-400'}
+            `}
+          >
+            <LayoutDashboard className="w-5 h-5" />
+            <span className="text-[10px] font-medium tracking-tight">Dashboard</span>
+          </NavLink>
+
+          {/* Billing */}
+          <NavLink
+            to="/billing"
+            className={({ isActive }) => `
+              flex flex-col items-center justify-center flex-1 h-full py-2 gap-0.5 text-center
+              ${isActive ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-500 dark:text-slate-400'}
+            `}
+          >
+            <ShoppingCart className="w-5 h-5" />
+            <span className="text-[10px] font-medium tracking-tight">Billing</span>
+          </NavLink>
+
+          {/* Products */}
+          <NavLink
+            to="/admin/products"
+            className={({ isActive }) => `
+              flex flex-col items-center justify-center flex-1 h-full py-2 gap-0.5 text-center
+              ${isActive ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-500 dark:text-slate-400'}
+            `}
+          >
+            <Package className="w-5 h-5" />
+            <span className="text-[10px] font-medium tracking-tight">Products</span>
+          </NavLink>
+
+          {/* Inventory */}
+          <NavLink
+            to="/admin/inventory"
+            className={({ isActive }) => `
+              flex flex-col items-center justify-center flex-1 h-full py-2 gap-0.5 text-center
+              ${isActive ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-500 dark:text-slate-400'}
+            `}
+          >
+            <AlertTriangle className="w-5 h-5" />
+            <span className="text-[10px] font-medium tracking-tight">Inventory</span>
+          </NavLink>
+
+          {/* More Menu */}
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            className="flex flex-col items-center justify-center flex-1 h-full py-2 gap-0.5 text-center text-slate-500 dark:text-slate-400 cursor-pointer"
+          >
+            <Menu className="w-5 h-5" />
+            <span className="text-[10px] font-medium tracking-tight">More</span>
+          </button>
+        </div>
+      </div>
+
     </div>
   );
 }

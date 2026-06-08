@@ -54,16 +54,16 @@ export default function CustomerManagement() {
   return (
     <div className="space-y-10 pb-20">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-200 dark:border-slate-800 pb-10">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 border-b border-slate-200 dark:border-slate-800 pb-6 sm:pb-10">
         <div className="space-y-1">
-            <h1 className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
                 Customers
             </h1>
             <p className="text-slate-500 font-medium">
                 View and manage your store's customer base and their purchase history.
             </p>
         </div>
-        <div className="bg-white dark:bg-slate-900 px-6 py-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-4">
+        <div className="bg-white dark:bg-slate-900 px-5 py-3.5 sm:px-6 sm:py-4 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-3 sm:gap-4 self-start sm:self-auto">
             <Users className="w-5 h-5 text-indigo-500" />
             <div className="flex flex-col">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Total Customers</span>
@@ -72,14 +72,14 @@ export default function CustomerManagement() {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden relative group">
-        <div className="p-8 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden relative group">
+        <div className="p-4 sm:p-8 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
           <div className="relative max-w-md group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input 
               type="text" 
               placeholder="Search by name or mobile number..."
-              className="w-full pl-12 pr-4 py-4 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-semibold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm"
+              className="w-full pl-12 pr-4 py-3 sm:py-4 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-2xl text-sm font-semibold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm"
               value={search}
               onChange={e => setSearch(e.target.value)}
             />
@@ -155,7 +155,7 @@ export default function CustomerManagement() {
       {/* History Modal */}
       {selectedCustomer && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[90vh] shadow-2xl relative">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-[calc(100vw-2rem)] sm:max-w-2xl rounded-2xl sm:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[90vh] shadow-2xl relative no-scrollbar">
             <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
               <div>
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white">Purchase History</h3>

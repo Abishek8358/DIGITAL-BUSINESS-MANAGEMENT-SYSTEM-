@@ -126,19 +126,19 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-10 pb-12 animate-in fade-in duration-500">
       {/* Hero Header */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 border-b border-slate-200 dark:border-slate-800 pb-10">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 border-b border-slate-200 dark:border-slate-800 pb-6 sm:pb-10">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
              <div className="px-3 py-1 bg-indigo-600 text-[10px] font-black text-white rounded-lg uppercase tracking-widest shadow-lg shadow-indigo-600/20">Pro Insights</div>
              <p className="text-slate-500 dark:text-slate-400 font-bold text-[10px] uppercase tracking-widest">{new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
           </div>
-          <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight italic uppercase">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white tracking-tight italic uppercase">
             Business <span className="text-indigo-600 dark:text-indigo-400">Intelligence</span>
           </h1>
         </div>
 
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex items-center p-1.5 bg-slate-100 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-inner">
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-inner overflow-x-auto mobile-scrollbar-hide max-w-full">
             {[
               { id: 'today', label: 'Today' },
               { id: 'week', label: 'Week' },
@@ -148,7 +148,7 @@ export default function AdminDashboard() {
               <button
                 key={f.id}
                 onClick={() => setFilter(f.id)}
-                className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${filter === f.id ? 'bg-white dark:bg-slate-800 text-indigo-600 shadow-sm' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'}`}
+                className={`px-4 sm:px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 whitespace-nowrap ${filter === f.id ? 'bg-white dark:bg-slate-800 text-indigo-600 shadow-sm' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'}`}
               >
                 {f.label}
               </button>
@@ -156,41 +156,41 @@ export default function AdminDashboard() {
           </div>
           <button 
             onClick={fetchData}
-            className="p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-400 hover:text-indigo-600 transition-all hover:rotate-180 duration-500"
+            className="p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-400 hover:text-indigo-600 transition-all hover:rotate-180 duration-500 shrink-0"
           >
-            <RefreshCcw className="w-5 h-5" />
+            <RefreshCcw className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
       </div>
 
       {/* Main Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {mainStats.map((card) => (
-          <div key={card.name} className="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all group relative overflow-hidden">
+          <div key={card.name} className="bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-8 rounded-2xl sm:rounded-[2rem] lg:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm hover:flutter-shadow hover:shadow-xl transition-all group relative overflow-hidden">
             <div className={`absolute -right-4 -bottom-4 w-24 h-24 rounded-full ${card.bg} opacity-20 group-hover:scale-150 transition-transform`} />
-            <div className="flex items-center justify-between mb-6">
-              <div className={`${card.bg} p-4 rounded-2xl group-hover:scale-110 transition-transform`}>
-                <card.icon className={`w-7 h-7 ${card.color}`} />
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <div className={`${card.bg} p-3 sm:p-4 rounded-xl sm:rounded-2xl group-hover:scale-110 transition-transform`}>
+                <card.icon className={`w-5 h-5 sm:w-7 sm:h-7 ${card.color}`} />
               </div>
             </div>
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{card.name}</p>
-            <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+            <h3 className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
               {card.isMoney ? `₹${Number(card.value).toLocaleString()}` : Number(card.value).toLocaleString()}
             </h3>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
         {/* Sales Trend Line Chart */}
-        <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-10 rounded-[3rem] border border-slate-200 dark:border-slate-800 h-[500px] flex flex-col shadow-sm">
-          <div className="flex items-center justify-between mb-8">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-10 rounded-2xl sm:rounded-[2rem] lg:rounded-[3rem] border border-slate-200 dark:border-slate-800 h-[300px] sm:h-[400px] lg:h-[500px] flex flex-col shadow-sm">
+          <div className="flex items-center justify-between mb-4 sm:mb-8">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl flex items-center justify-center">
-                <Activity className="w-6 h-6 text-indigo-600" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl flex items-center justify-center">
+                <Activity className="w-4 h-4 sm:w-6 sm:h-6 text-indigo-600" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight uppercase italic">Sales <span className="text-indigo-600">Performance</span></h3>
+                <h3 className="text-base sm:text-lg lg:text-xl font-bold text-slate-900 dark:text-white tracking-tight uppercase italic">Sales <span className="text-indigo-600">Performance</span></h3>
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Weekly Revenue Trend</p>
               </div>
             </div>
@@ -218,25 +218,25 @@ export default function AdminDashboard() {
         </div>
 
         {/* Stock Status Summary */}
-        <div className="bg-white dark:bg-slate-900 p-8 rounded-[3rem] border border-slate-200 dark:border-slate-800 flex flex-col h-[500px] shadow-sm">
-          <div className="flex items-center justify-between mb-10">
+        <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-8 rounded-2xl sm:rounded-[2rem] lg:rounded-[3rem] border border-slate-200 dark:border-slate-800 flex flex-col h-auto lg:h-[500px] shadow-sm">
+          <div className="flex items-center justify-between mb-6 sm:mb-10">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-amber-50 dark:bg-amber-500/10 rounded-xl flex items-center justify-center">
-                <PieIcon className="w-6 h-6 text-amber-500" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-amber-50 dark:bg-amber-500/10 rounded-xl flex items-center justify-center">
+                <PieIcon className="w-4 h-4 sm:w-6 sm:h-6 text-amber-500" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight uppercase italic">Stock <span className="text-amber-500">Summary</span></h3>
+              <h3 className="text-base sm:text-lg lg:text-xl font-bold text-slate-900 dark:text-white tracking-tight uppercase italic">Stock <span className="text-amber-500">Summary</span></h3>
             </div>
           </div>
-          <div className="grid grid-cols-1 gap-4 flex-1">
+          <div className="grid grid-cols-1 gap-3 sm:gap-4 flex-1">
             {stockStats.map((s) => (
-              <div key={s.name} className="p-6 rounded-[2rem] bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 flex items-center justify-between group hover:border-indigo-200 transition-all">
-                <div className="flex items-center gap-4">
-                  <div className={`${s.bg} p-3 rounded-xl`}>
-                    <s.icon className={`w-5 h-5 ${s.color}`} />
+              <div key={s.name} className="p-4 sm:p-6 rounded-xl sm:rounded-[2rem] bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 flex items-center justify-between group hover:border-indigo-200 transition-all">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className={`${s.bg} p-2 sm:p-3 rounded-lg sm:rounded-xl`}>
+                    <s.icon className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{s.name}</span>
                 </div>
-                <span className="text-2xl font-black text-slate-900 dark:text-white">{s.value}</span>
+                <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">{s.value}</span>
               </div>
             ))}
           </div>
@@ -244,16 +244,16 @@ export default function AdminDashboard() {
       </div>
 
       {/* Product Analysis Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
         {/* Most Profitable */}
-        <div className="bg-white dark:bg-slate-900 p-10 rounded-[3rem] border border-slate-200 dark:border-slate-800 shadow-sm">
-          <div className="flex items-center justify-between mb-8">
-            <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight italic">Most <span className="text-emerald-600">Profitable</span></h3>
-            <TrendingUp className="w-5 h-5 text-emerald-500 opacity-30" />
+        <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-10 rounded-2xl sm:rounded-[2rem] lg:rounded-[3rem] border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div className="flex items-center justify-between mb-6 sm:mb-8">
+            <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight italic">Most <span className="text-emerald-600">Profitable</span></h3>
+            <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 opacity-30" />
           </div>
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {analytics?.mostProfitable?.map((item: any, idx: number) => (
-              <div key={idx} className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800">
+              <div key={idx} className="flex items-center justify-between p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800">
                 <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase truncate max-w-[150px]">{item.name}</span>
                 <span className="text-xs font-black text-emerald-600">₹{Math.round(item.total_profit).toLocaleString()}</span>
               </div>
@@ -262,14 +262,14 @@ export default function AdminDashboard() {
         </div>
 
         {/* Top Selling */}
-        <div className="bg-white dark:bg-slate-900 p-10 rounded-[3rem] border border-slate-200 dark:border-slate-800 shadow-sm">
-          <div className="flex items-center justify-between mb-8">
-            <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight italic">Top <span className="text-indigo-600">Selling</span></h3>
-            <ShoppingBag className="w-5 h-5 text-indigo-500 opacity-30" />
+        <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-10 rounded-2xl sm:rounded-[2rem] lg:rounded-[3rem] border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div className="flex items-center justify-between mb-6 sm:mb-8">
+            <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight italic">Top <span className="text-indigo-600">Selling</span></h3>
+            <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-500 opacity-30" />
           </div>
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {analytics?.topSelling?.map((item: any, idx: number) => (
-              <div key={idx} className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800">
+              <div key={idx} className="flex items-center justify-between p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800">
                 <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase truncate max-w-[150px]">{item.name}</span>
                 <span className="text-xs font-black text-indigo-600">{item.total_sold} Sold</span>
               </div>
@@ -278,14 +278,14 @@ export default function AdminDashboard() {
         </div>
 
         {/* Least Selling */}
-        <div className="bg-white dark:bg-slate-900 p-10 rounded-[3rem] border border-slate-200 dark:border-slate-800 shadow-sm">
-          <div className="flex items-center justify-between mb-8">
-            <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight italic">Least <span className="text-amber-600">Selling</span></h3>
-            <Zap className="w-5 h-5 text-amber-500 opacity-30" />
+        <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-10 rounded-2xl sm:rounded-[2rem] lg:rounded-[3rem] border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div className="flex items-center justify-between mb-6 sm:mb-8">
+            <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight italic">Least <span className="text-amber-600">Selling</span></h3>
+            <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 opacity-30" />
           </div>
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {analytics?.leastSelling?.map((item: any, idx: number) => (
-              <div key={idx} className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800">
+              <div key={idx} className="flex items-center justify-between p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800">
                 <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase truncate max-w-[150px]">{item.name}</span>
                 <span className="text-xs font-black text-amber-600">{item.total_sold} Sold</span>
               </div>
@@ -294,33 +294,33 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
         {/* Customer Analysis */}
-        <div className="bg-white dark:bg-slate-900 p-10 rounded-[3rem] border border-slate-200 dark:border-slate-800 shadow-sm">
-          <div className="flex items-center justify-between mb-10">
+        <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-10 rounded-2xl sm:rounded-[2rem] lg:rounded-[3rem] border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div className="flex items-center justify-between mb-6 sm:mb-10">
             <div className="flex items-center gap-3">
-               <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl flex items-center justify-center">
-                  <Users className="w-6 h-6 text-indigo-600" />
+               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl flex items-center justify-center">
+                  <Users className="w-4 h-4 sm:w-6 sm:h-6 text-indigo-600" />
                </div>
-               <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight uppercase italic">Customer <span className="text-indigo-600">Insights</span></h3>
+               <h3 className="text-base sm:text-lg lg:text-xl font-bold text-slate-900 dark:text-white tracking-tight uppercase italic">Customer <span className="text-indigo-600">Insights</span></h3>
             </div>
             <div className="text-right">
                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Loyalty Base</p>
-               <p className="text-xl font-black text-slate-900 dark:text-white">{analytics?.customers?.total || stats?.totalCustomers || 0}</p>
+               <p className="text-lg sm:text-xl font-black text-slate-900 dark:text-white">{analytics?.customers?.total || stats?.totalCustomers || 0}</p>
             </div>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
              {analytics?.customers?.frequent?.map((c: any, idx: number) => (
-               <div key={idx} className="flex items-center justify-between p-5 rounded-[2rem] bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 group hover:bg-white transition-all">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-indigo-600/10 text-indigo-600 flex items-center justify-center font-black text-xs">
+               <div key={idx} className="flex items-center justify-between p-4 sm:p-5 rounded-xl sm:rounded-[2rem] bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 group hover:bg-white transition-all">
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-indigo-600/10 text-indigo-600 flex items-center justify-center font-black text-xs">
                        {idx + 1}
                     </div>
                     <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-tight">{c.name}</span>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3">
                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{c.purchase_count} Orders</span>
-                     <ArrowRight className="w-4 h-4 text-indigo-400 group-hover:translate-x-1 transition-transform" />
+                     <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-400 group-hover:translate-x-1 transition-transform" />
                   </div>
                </div>
              ))}
@@ -328,14 +328,14 @@ export default function AdminDashboard() {
         </div>
 
         {/* Revenue History (Fixed Sorting) */}
-        <div className="bg-white dark:bg-slate-900 p-10 rounded-[3rem] border border-slate-200 dark:border-slate-800 h-[500px] flex flex-col shadow-sm">
-           <div className="flex items-center justify-between mb-8">
+        <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-10 rounded-2xl sm:rounded-[2rem] lg:rounded-[3rem] border border-slate-200 dark:border-slate-800 h-[300px] sm:h-[400px] lg:h-[500px] flex flex-col shadow-sm">
+           <div className="flex items-center justify-between mb-4 sm:mb-8">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl flex items-center justify-center">
-                  <BarChart3 className="w-6 h-6 text-indigo-600" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl flex items-center justify-center">
+                  <BarChart3 className="w-4 h-4 sm:w-6 sm:h-6 text-indigo-600" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight uppercase italic">Annual <span className="text-indigo-600">History</span></h3>
+                  <h3 className="text-base sm:text-lg lg:text-xl font-bold text-slate-900 dark:text-white tracking-tight uppercase italic">Annual <span className="text-indigo-600">History</span></h3>
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">12 Month Revenue View</p>
                 </div>
               </div>
@@ -347,7 +347,7 @@ export default function AdminDashboard() {
                     <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fontSize: 9, fill: '#94a3b8', fontWeight: 900}} />
                     <YAxis axisLine={false} tickLine={false} tick={{fontSize: 9, fill: '#94a3b8', fontWeight: 900}} />
                     <Tooltip cursor={{fill: 'rgba(0,0,0,0.02)'}} />
-                    <Bar dataKey="revenue" fill="#4f46e5" radius={[10, 10, 0, 0]} barSize={35} />
+                    <Bar dataKey="revenue" fill="#4f46e5" radius={[10, 10, 0, 0]} barSize={24} />
                  </BarChart>
               </ResponsiveContainer>
            </div>

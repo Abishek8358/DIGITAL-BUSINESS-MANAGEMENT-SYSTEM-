@@ -12,6 +12,7 @@ export default function BillingPage() {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
+  const [isMobileCartOpen, setIsMobileCartOpen] = useState(false);
   const [receipt, setReceipt] = useState<any>(null);
   const [stockToast, setStockToast] = useState<string | null>(null);
 
@@ -389,13 +390,13 @@ export default function BillingPage() {
   );
 
   return (
-    <div className="flex h-[calc(100vh-160px)] gap-8 antialiased">
+    <div className="flex flex-col lg:flex-row min-h-[calc(100vh-140px)] lg:h-[calc(100vh-160px)] gap-4 lg:gap-8 antialiased">
 
       {/* 1. Product Grid Section (Left) */}
-      <div className="flex-1 flex flex-col min-w-0 space-y-6">
+      <div className="flex-1 flex flex-col min-w-0 space-y-4 sm:space-y-6">
 
         {/* Search & Breadcrumbs */}
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+        <div className="bg-white dark:bg-slate-900 p-3 sm:p-4 rounded-2xl sm:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm space-y-3 sm:space-y-4">
           <div className="relative group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
             <input
@@ -408,10 +409,10 @@ export default function BillingPage() {
           </div>
 
           {!search && (
-            <div className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-1">
+            <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto mobile-scrollbar-hide pb-1">
               <button
                 onClick={resetSelection}
-                className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 flex-shrink-0 border ${selectedCategoryId === 'all'
+                className={`px-4 sm:px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 flex-shrink-0 border ${selectedCategoryId === 'all'
                     ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-600/20'
                     : 'bg-white dark:bg-slate-900 text-slate-400 dark:text-slate-500 border-slate-200 dark:border-slate-800 hover:text-slate-900 dark:hover:text-white'
                   }`}
@@ -423,7 +424,7 @@ export default function BillingPage() {
                   <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-700 flex-shrink-0" />
                   <button
                     onClick={() => selectCategory(selectedCategoryId as number)}
-                    className="px-5 py-2.5 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-all flex items-center gap-2"
+                    className="px-4 sm:px-5 py-2.5 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-all flex items-center gap-2 shrink-0"
                   >
                     {categories.find(c => c.id === selectedCategoryId)?.name}
                   </button>
@@ -434,7 +435,7 @@ export default function BillingPage() {
                   <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-700 flex-shrink-0" />
                   <button
                     onClick={() => { setSelectedProductId(selectedProductId); setSelectedBrandId(null); }}
-                    className="px-5 py-2.5 bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-100 dark:border-purple-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest hover:shadow-md transition-all flex items-center gap-2"
+                    className="px-4 sm:px-5 py-2.5 bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-100 dark:border-purple-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest hover:shadow-md transition-all flex items-center gap-2 shrink-0"
                   >
                     {variants.find(v => v.productId === selectedProductId)?.productName}
                   </button>
@@ -443,7 +444,7 @@ export default function BillingPage() {
               {selectedBrandId && (
                 <>
                   <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-700 flex-shrink-0" />
-                  <span className="px-5 py-2.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                  <span className="px-4 sm:px-5 py-2.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shrink-0">
                     {variants.find(v => v.brandId === selectedBrandId)?.brandName}
                   </span>
                 </>
@@ -456,31 +457,31 @@ export default function BillingPage() {
         {!search && (
           <div className="space-y-4">
             {selectedCategoryId === 'all' && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-4">
                 {categories.map(cat => (
                   <button
                     key={cat.id}
                     onClick={() => selectCategory(cat.id)}
-                    className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:border-indigo-100 dark:hover:border-indigo-900/40 transition-all text-center group"
+                    className="bg-white dark:bg-slate-900 p-3 sm:p-6 rounded-xl sm:rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:border-indigo-100 dark:hover:border-indigo-900/40 transition-all text-center group"
                   >
-                    <div className="w-12 h-12 mx-auto mb-3 bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl flex items-center justify-center border border-indigo-100 dark:border-indigo-500/20 group-hover:scale-110 group-hover:rotate-3 transition-transform">
-                      <Tags className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl sm:rounded-2xl flex items-center justify-center border border-indigo-100 dark:border-indigo-500/20 group-hover:scale-110 group-hover:rotate-3 transition-transform">
+                      <Tags className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-600 dark:text-indigo-400" />
                     </div>
-                    <p className="text-[11px] font-bold text-slate-900 dark:text-white uppercase tracking-widest truncate">{cat.name}</p>
+                    <p className="text-[9px] sm:text-[11px] font-bold text-slate-900 dark:text-white uppercase tracking-widest truncate">{cat.name}</p>
                   </button>
                 ))}
               </div>
             )}
 
             {selectedCategoryId !== 'all' && !selectedProductId && (
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 animate-in fade-in slide-in-from-bottom-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 animate-in fade-in slide-in-from-bottom-2">
                 {products.map(p => (
                   <button
                     key={p.id}
                     onClick={() => selectProduct(p.id)}
-                    className="bg-white dark:bg-slate-900 p-4 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:border-purple-100 dark:hover:border-purple-900/40 transition-all text-center group"
+                    className="bg-white dark:bg-slate-900 p-3 sm:p-4 rounded-xl sm:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:border-purple-100 dark:hover:border-purple-900/40 transition-all text-center group"
                   >
-                    <div className="aspect-square rounded-[2rem] bg-slate-50 dark:bg-slate-950 mb-3 overflow-hidden shadow-inner">
+                    <div className="aspect-square rounded-lg sm:rounded-[2rem] bg-slate-50 dark:bg-slate-950 mb-3 overflow-hidden shadow-inner">
                       <img
                         src={p.imageUrl || DEFAULT_PRODUCT_IMAGE}
                         alt={p.name}
@@ -491,25 +492,25 @@ export default function BillingPage() {
                     <p className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-widest truncate">{p.name}</p>
                   </button>
                 ))}
-                <button onClick={resetSelection} className="aspect-square flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2.5rem] text-slate-400 hover:text-red-500 hover:border-red-200 transition-all gap-2">
-                  <X className="w-6 h-6" />
+                <button onClick={resetSelection} className="aspect-square flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-[2.5rem] text-slate-400 hover:text-red-500 hover:border-red-200 transition-all gap-2 cursor-pointer">
+                  <X className="w-5 h-5 sm:w-6 sm:h-6" />
                   <span className="text-[10px] font-bold uppercase tracking-widest">Reset</span>
                 </button>
               </div>
             )}
 
             {selectedProductId && !selectedBrandId && (
-              <div className="flex flex-wrap gap-3 animate-in fade-in slide-in-from-bottom-2">
+              <div className="flex flex-wrap gap-2 sm:gap-3 animate-in fade-in slide-in-from-bottom-2">
                 {brands.map(b => (
                   <button
                     key={b.id}
                     onClick={() => setSelectedBrandId(b.id)}
-                    className="px-8 py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[1.5rem] shadow-sm hover:shadow-md hover:border-emerald-100 dark:hover:border-emerald-900/40 transition-all text-xs font-bold text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-3 group"
+                    className="px-4 sm:px-8 py-3 sm:py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-[1.5rem] shadow-sm hover:shadow-md hover:border-emerald-100 dark:hover:border-emerald-900/40 transition-all text-xs font-bold text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-2 sm:gap-3 group shrink-0"
                   >
-                    <Layers className="w-5 h-5 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform" /> {b.name}
+                    <Layers className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform" /> {b.name}
                   </button>
                 ))}
-                <button onClick={() => selectCategory(selectedCategoryId as number)} className="px-8 py-4 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[1.5rem] text-slate-400 text-xs font-bold uppercase hover:text-indigo-600 hover:border-indigo-200 transition-all">Back</button>
+                <button onClick={() => selectCategory(selectedCategoryId as number)} className="px-4 sm:px-8 py-3 sm:py-4 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-[1.5rem] text-slate-400 text-xs font-bold uppercase hover:text-indigo-600 hover:border-indigo-200 transition-all cursor-pointer">Back</button>
               </div>
             )}
           </div>
@@ -518,11 +519,11 @@ export default function BillingPage() {
         {/* Variants Result Grid */}
         <div className="flex-1 overflow-y-auto pr-2 no-scrollbar">
           {showProductGrid && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-6 animate-in fade-in duration-500">
+            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6 animate-in fade-in duration-500">
               {filteredVariants.length === 0 ? (
-                <div className="col-span-full py-20 flex flex-col items-center justify-center bg-white dark:bg-slate-900 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800 text-slate-400">
-                  <Package className="w-16 h-16 mb-4 opacity-10" />
-                  <p className="font-bold uppercase tracking-widest text-sm">No products found.</p>
+                <div className="col-span-full py-16 sm:py-20 flex flex-col items-center justify-center bg-white dark:bg-slate-900 rounded-2xl sm:rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800 text-slate-400">
+                  <Package className="w-12 h-12 sm:w-16 sm:h-16 mb-4 opacity-10" />
+                  <p className="font-bold uppercase tracking-widest text-xs sm:text-sm">No products found.</p>
                 </div>
               ) : (
                 filteredVariants.map(variant => (
@@ -530,7 +531,7 @@ export default function BillingPage() {
                     key={variant.variantId}
                     onClick={() => addToCart(variant)}
                     className={`
-                      bg-white dark:bg-slate-900 p-4 rounded-[2.5rem] border transition-all relative
+                      bg-white dark:bg-slate-900 p-3 sm:p-4 rounded-2xl sm:rounded-[2.5rem] border transition-all relative
                       ${variant.stock <= 0
                         ? 'border-red-200 dark:border-red-900/40 shadow-sm opacity-60 cursor-not-allowed'
                         : variant.stock <= (variant.minimumStock || 0)
@@ -538,7 +539,7 @@ export default function BillingPage() {
                           : 'border-slate-100 dark:border-slate-800 shadow-md hover:border-indigo-100 dark:hover:border-indigo-900/40 cursor-pointer group hover:shadow-2xl hover:-translate-y-1'}
                     `}
                   >
-                    <div className="aspect-square rounded-[2rem] bg-slate-50 dark:bg-slate-950 mb-4 overflow-hidden relative shadow-inner">
+                    <div className="aspect-square rounded-xl sm:rounded-[2rem] bg-slate-50 dark:bg-slate-950 mb-3 sm:mb-4 overflow-hidden relative shadow-inner">
                       <img
                         src={variant.imageUrl || DEFAULT_PRODUCT_IMAGE}
                         alt={variant.variantName}
@@ -546,20 +547,20 @@ export default function BillingPage() {
                         onError={(e: any) => { e.target.src = DEFAULT_PRODUCT_IMAGE; }}
                       />
                       {variant.stock <= 0 ? (
-                        <div className="absolute top-3 right-3 bg-slate-800 text-white text-[9px] px-3 py-1 rounded-full font-bold uppercase tracking-widest shadow-lg">Out of Stock</div>
+                        <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-slate-800 text-white text-[8px] sm:text-[9px] px-2 sm:px-3 py-0.5 sm:py-1 rounded-full font-bold uppercase tracking-widest shadow-lg">Out of Stock</div>
                       ) : variant.stock <= (variant.minimumStock || 0) ? (
-                        <div className="absolute top-3 right-3 bg-red-600 text-white text-[9px] px-3 py-1 rounded-full font-bold uppercase tracking-widest shadow-lg shadow-red-600/30">Low Stock</div>
+                        <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-red-600 text-white text-[8px] sm:text-[9px] px-2 sm:px-3 py-0.5 sm:py-1 rounded-full font-bold uppercase tracking-widest shadow-lg shadow-red-600/30">Low Stock</div>
                       ) : null}
                     </div>
                     <div className="px-1 text-center">
                       <h4 className="font-bold text-xs text-slate-900 dark:text-white uppercase tracking-tight truncate">{variant.productName}</h4>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5 truncate">{variant.brandName} &bull; {variant.variantName}</p>
+                      <p className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5 truncate">{variant.brandName} &bull; {variant.variantName}</p>
 
-                      <div className="flex items-center justify-between mt-4">
-                        <span className="font-bold text-indigo-600 dark:text-indigo-400 text-sm">₹{Number(variant.sellingPrice).toLocaleString()}</span>
+                      <div className="flex items-center justify-between mt-3 sm:mt-4">
+                        <span className="font-bold text-indigo-600 dark:text-indigo-400 text-xs sm:text-sm">₹{Number(variant.sellingPrice).toLocaleString()}</span>
                         {variant.stock > 0 && (
-                          <div className="w-10 h-10 rounded-2xl bg-slate-900 dark:bg-indigo-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 shadow-xl">
-                            <Plus className="w-5 h-5" />
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-slate-900 dark:bg-indigo-600 text-white flex items-center justify-center opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all scale-100 lg:scale-75 lg:group-hover:scale-100 shadow-xl">
+                            <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
                           </div>
                         )}
                       </div>
@@ -571,20 +572,20 @@ export default function BillingPage() {
           )}
 
           {!search && selectedCategoryId === 'all' && (
-            <div className="flex flex-col items-center justify-center h-[50vh] text-center animate-in fade-in duration-1000">
-              <div className="w-24 h-24 bg-white dark:bg-slate-900 rounded-[2.5rem] flex items-center justify-center border border-slate-100 dark:border-slate-800 shadow-2xl mb-8 group overflow-hidden relative">
+            <div className="flex flex-col items-center justify-center h-[40vh] sm:h-[50vh] text-center animate-in fade-in duration-1000">
+              <div className="w-16 h-16 sm:w-24 sm:h-24 bg-white dark:bg-slate-900 rounded-2xl sm:rounded-[2.5rem] flex items-center justify-center border border-slate-100 dark:border-slate-800 shadow-2xl mb-4 sm:mb-8 group overflow-hidden relative">
                 <div className="absolute inset-0 bg-indigo-500/10 dark:bg-indigo-500/5 group-hover:scale-110 transition-transform" />
-                <ShoppingCart className="w-10 h-10 text-indigo-600 dark:text-indigo-400 relative z-10" />
+                <ShoppingCart className="w-8 h-8 sm:w-10 sm:h-10 text-indigo-600 dark:text-indigo-400 relative z-10" />
               </div>
-              <h3 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight mb-3">Product Selection</h3>
-              <p className="max-w-xs mx-auto text-sm font-medium text-slate-500 leading-relaxed">Choose a category or search for products to start billing.</p>
+              <h3 className="text-xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight mb-2 sm:mb-3">Product Selection</h3>
+              <p className="max-w-xs mx-auto text-xs sm:text-sm font-medium text-slate-500 leading-relaxed">Choose a category or search for products to start billing.</p>
             </div>
           )}
         </div>
       </div>
 
-      {/* 2. Cart Section (Right) */}
-      <div className="w-[420px] flex flex-col bg-white dark:bg-slate-900 rounded-[3rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden flex-shrink-0 animate-in slide-in-from-right-4 duration-500">
+      {/* 2. Cart Section (Right - Desktop) */}
+      <div className="hidden lg:flex w-[420px] flex-col bg-white dark:bg-slate-900 rounded-[3rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden flex-shrink-0 animate-in slide-in-from-right-4 duration-500">
         <div className="p-8 pb-6 border-b border-slate-50 dark:border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl flex items-center justify-center border border-indigo-100 dark:border-indigo-500/20">
@@ -659,17 +660,104 @@ export default function BillingPage() {
           <button
             disabled={cart.length === 0}
             onClick={() => setIsCheckoutModalOpen(true)}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-5 rounded-[1.5rem] font-bold uppercase tracking-widest flex items-center justify-center gap-3 disabled:opacity-30 shadow-xl shadow-indigo-600/20 active:scale-95 transition-all"
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-5 rounded-[1.5rem] font-bold uppercase tracking-widest flex items-center justify-center gap-3 disabled:opacity-30 shadow-xl shadow-indigo-600/20 active:scale-95 transition-all cursor-pointer"
           >
             Go to Checkout <ChevronRight className="w-5 h-5" />
           </button>
         </div>
       </div>
 
+      {/* Mobile Floating Cart Button */}
+      {cart.length > 0 && (
+        <button
+          onClick={() => setIsMobileCartOpen(true)}
+          className="fixed bottom-20 right-4 z-30 lg:hidden w-14 h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full flex items-center justify-center shadow-lg shadow-indigo-600/30 active:scale-95 transition-all cursor-pointer border-none"
+        >
+          <div className="relative">
+            <ShoppingCart className="w-6 h-6" />
+            <span className="absolute -top-3 -right-3 px-2 py-0.5 bg-red-600 text-white text-[10px] font-black rounded-full border border-white">
+              {cart.reduce((sum, item) => sum + item.quantity, 0)}
+            </span>
+          </div>
+        </button>
+      )}
+
+      {/* Mobile Cart Bottom Sheet */}
+      {isMobileCartOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden bg-slate-950/60 backdrop-blur-sm flex items-end animate-in fade-in duration-300">
+          <div className="bg-white dark:bg-slate-900 w-full max-h-[85vh] rounded-t-[2rem] border-t border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col animate-in slide-in-from-bottom duration-300">
+            {/* Header */}
+            <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl flex items-center justify-center">
+                  <Receipt className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                </div>
+                <div>
+                  <h2 className="text-base font-bold text-slate-900 dark:text-white">Cart</h2>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{cart.length} Items Selected</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsMobileCartOpen(false)}
+                className="p-2 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 cursor-pointer border-none"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Cart Items */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar">
+              {cart.map(item => (
+                <div key={item.variantId} className="flex gap-3 p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                  <div className="w-12 h-12 rounded-lg overflow-hidden bg-white dark:bg-slate-900 flex-shrink-0 border border-slate-100 dark:border-slate-800">
+                    <img
+                      src={item.imageUrl || DEFAULT_PRODUCT_IMAGE}
+                      className="w-full h-full object-cover"
+                      onError={(e: any) => { e.target.src = DEFAULT_PRODUCT_IMAGE; }}
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0 flex flex-col justify-center">
+                    <h4 className="font-bold text-xs text-slate-900 dark:text-white uppercase tracking-tight truncate">{item.productName}</h4>
+                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest truncate">{item.brandName} &bull; {item.variantName}</p>
+                    <div className="flex items-center justify-between mt-2">
+                      <p className="font-bold text-indigo-600 dark:text-indigo-400 text-xs">₹{Number(item.total).toFixed(2)}</p>
+                      <div className="flex items-center bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden">
+                        <button onClick={() => updateQuantity(item.variantId, -1)} className="p-1 hover:bg-slate-50 dark:hover:bg-slate-800 border-none cursor-pointer"><Minus className="w-3 h-3 text-slate-400" /></button>
+                        <span className="px-2 text-xs font-bold text-slate-900 dark:text-white min-w-[20px] text-center">{item.quantity}</span>
+                        <button onClick={() => updateQuantity(item.variantId, 1)} className="p-1 hover:bg-slate-50 dark:hover:bg-slate-800 border-none cursor-pointer"><Plus className="w-3 h-3 text-indigo-600" /></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Footer Summary */}
+            <div className="p-6 bg-slate-50 dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 space-y-4 pb-safe-bottom">
+              <div className="flex justify-between items-end">
+                <div>
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-0.5">Payable Amount</span>
+                  <span className="text-2xl font-bold text-slate-900 dark:text-white tracking-tighter">₹{cartTotal.toLocaleString()}</span>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setIsMobileCartOpen(false);
+                  setIsCheckoutModalOpen(true);
+                }}
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl font-bold uppercase tracking-widest flex items-center justify-center gap-2 shadow-xl shadow-indigo-600/20 active:scale-95 transition-all cursor-pointer border-none"
+              >
+                Go to Checkout <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Checkout Modal */}
       {isCheckoutModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-[3rem] border border-slate-100 dark:border-slate-800 overflow-hidden shadow-2xl relative">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-[calc(100vw-2rem)] sm:max-w-md rounded-2xl sm:rounded-[3rem] border border-slate-100 dark:border-slate-800 overflow-hidden shadow-2xl relative max-h-[90vh] overflow-y-auto no-scrollbar">
             <div className="p-8 border-b border-slate-50 dark:border-slate-800 flex justify-between items-center">
               <div>
                 <h3 className="text-2xl font-bold text-slate-900 dark:text-white">Checkout</h3>
@@ -781,7 +869,7 @@ export default function BillingPage() {
       {/* Receipt / Success Modal — Invoice Style */}
       {receipt && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-sm animate-in zoom-in-95 duration-300">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-[3rem] border border-slate-100 dark:border-slate-800 shadow-2xl relative overflow-hidden max-h-[90vh] overflow-y-auto no-scrollbar">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-[calc(100vw-2rem)] sm:max-w-lg rounded-2xl sm:rounded-[3rem] border border-slate-100 dark:border-slate-800 shadow-2xl relative overflow-hidden max-h-[90vh] overflow-y-auto no-scrollbar">
             <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-500 to-indigo-600" />
 
             {/* Store Header */}

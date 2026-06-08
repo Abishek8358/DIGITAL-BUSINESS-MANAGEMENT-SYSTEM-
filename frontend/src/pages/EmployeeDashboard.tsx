@@ -60,82 +60,82 @@ export default function EmployeeDashboard() {
   return (
     <div className="space-y-10 pb-20">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-200 dark:border-slate-800 pb-10">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 border-b border-slate-200 dark:border-slate-800 pb-6 sm:pb-10">
         <div className="space-y-1">
-            <h1 className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
                 Welcome back, <span className="text-indigo-600 dark:text-indigo-400">{user?.name}.</span>
             </h1>
             <p className="text-slate-500 font-medium">
                 Dashboard for {new Date().toLocaleDateString()}
             </p>
         </div>
-        <div className="flex items-center gap-4 bg-white dark:bg-slate-900 px-6 py-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-          <Clock className="w-5 h-5 text-indigo-500" />
+        <div className="flex items-center gap-4 bg-white dark:bg-slate-900 px-4 py-3 sm:px-6 sm:py-4 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm w-full sm:w-auto">
+          <Clock className="w-5 h-5 text-indigo-500 shrink-0" />
           <div className="flex flex-col text-left">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Current Time</span>
-               <span className="text-lg font-bold text-slate-900 dark:text-white">{new Date().toLocaleTimeString()}</span>
+               <span className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">{new Date().toLocaleTimeString()}</span>
           </div>
         </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
         {statCards.map((card) => (
-          <div key={card.name} className="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-xl flex items-center gap-8 group hover:-translate-y-1 transition-all">
-            <div className={`${card.bg} w-20 h-20 rounded-3xl flex items-center justify-center shadow-inner`}>
-              <card.icon className={`w-8 h-8 ${card.color}`} />
+          <div key={card.name} className="bg-white dark:bg-slate-900 p-5 sm:p-8 rounded-2xl sm:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-xl flex items-center gap-4 sm:gap-8 group hover:-translate-y-1 transition-all">
+            <div className={`${card.bg} w-14 h-14 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl flex items-center justify-center shadow-inner shrink-0`}>
+              <card.icon className="w-6 h-6 sm:w-8 sm:h-8" />
             </div>
             <div>
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{card.name}</p>
-              <h3 className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight">{card.value}</h3>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 sm:mb-2">{card.name}</p>
+              <h3 className="text-2xl sm:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">{card.value}</h3>
             </div>
           </div>
         ))}
       </div>
 
       {/* Recent Sales Table */}
-      <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden relative group">
-        <div className="p-8 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 flex items-center justify-between">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden relative group">
+        <div className="p-5 sm:p-8 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 flex items-center justify-between">
            <div>
-             <h3 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Recent Sales</h3>
-             <p className="text-sm text-slate-500 mt-1">A list of your most recent transactions.</p>
+             <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Recent Sales</h3>
+             <p className="text-xs sm:text-sm text-slate-500 mt-1">A list of your most recent transactions.</p>
            </div>
-           <TrendingUp className="w-8 h-8 text-indigo-500/20" />
+           <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-500/20" />
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
               <tr className="bg-slate-50 dark:bg-slate-800/40 text-slate-500 text-[10px] uppercase font-bold tracking-widest">
-                <th className="px-10 py-5">Invoice ID</th>
-                <th className="px-10 py-5">Customer</th>
-                <th className="px-10 py-5">Date</th>
-                <th className="px-10 py-5 text-right">Amount</th>
+                <th className="px-4 py-3 sm:px-10 sm:py-5">Invoice ID</th>
+                <th className="px-4 py-3 sm:px-10 sm:py-5">Customer</th>
+                <th className="px-4 py-3 sm:px-10 sm:py-5">Date</th>
+                <th className="px-4 py-3 sm:px-10 sm:py-5 text-right">Amount</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {stats?.recentSales?.map((sale: any) => (
                 <tr key={sale.id} className="group hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
-                  <td className="px-10 py-5">
-                    <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">{sale.invoiceId}</span>
+                  <td className="px-4 py-3 sm:px-10 sm:py-5">
+                    <span className="text-xs sm:text-sm font-bold text-indigo-600 dark:text-indigo-400">{sale.invoiceId}</span>
                   </td>
-                  <td className="px-10 py-5">
-                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                  <td className="px-4 py-3 sm:px-10 sm:py-5">
+                    <span className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200">
                         {sale.customerName || 'Walking Customer'}
                     </span>
                   </td>
-                  <td className="px-10 py-5">
-                    <span className="text-xs text-slate-500">
+                  <td className="px-4 py-3 sm:px-10 sm:py-5">
+                    <span className="text-[10px] sm:text-xs text-slate-500">
                         {new Date(sale.date).toLocaleDateString()}
                     </span>
                   </td>
-                  <td className="px-10 py-5 text-right">
-                    <span className="text-lg font-bold text-slate-900 dark:text-white">₹{sale.grandTotal.toLocaleString()}</span>
+                  <td className="px-4 py-3 sm:px-10 sm:py-5 text-right">
+                    <span className="text-sm sm:text-lg font-bold text-slate-900 dark:text-white">₹{sale.grandTotal.toLocaleString()}</span>
                   </td>
                 </tr>
               ))}
               {(!stats?.recentSales || stats.recentSales.length === 0) && (
                 <tr>
-                  <td colSpan={4} className="px-10 py-20 text-center text-slate-500 font-medium">
+                  <td colSpan={4} className="px-4 py-10 sm:px-10 sm:py-20 text-center text-slate-500 font-medium text-xs sm:text-sm">
                     No sales found for today.
                   </td>
                 </tr>
@@ -146,19 +146,19 @@ export default function EmployeeDashboard() {
       </div>
 
       {/* Floating Action / Complaint Section */}
-      <div className="bg-indigo-600 p-8 rounded-[2.5rem] flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl shadow-indigo-600/20">
-          <div className="flex items-center gap-6">
-              <div className="w-16 h-16 bg-white/20 rounded-3xl flex items-center justify-center">
-                  <MessageSquare className="w-8 h-8 text-white" />
+      <div className="bg-indigo-600 p-5 sm:p-8 rounded-2xl sm:rounded-[2.5rem] flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl shadow-indigo-600/20">
+          <div className="flex items-center gap-4 sm:gap-6 w-full sm:w-auto">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white/20 rounded-2xl sm:rounded-3xl flex items-center justify-center shrink-0">
+                  <MessageSquare className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
               </div>
               <div>
-                  <h3 className="text-xl font-bold text-white tracking-tight">Feedback & Support</h3>
-                  <p className="text-indigo-100 text-sm">Have an issue or suggestion? Submit a note to the admin.</p>
+                  <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight">Feedback & Support</h3>
+                  <p className="text-indigo-100 text-xs sm:text-sm">Have an issue or suggestion? Submit a note to the admin.</p>
               </div>
           </div>
           <button 
             onClick={() => setIsComplaintModalOpen(true)}
-            className="w-full md:w-auto px-10 py-4 bg-white text-indigo-600 rounded-2xl font-bold uppercase tracking-wider hover:bg-indigo-50 transition-colors shadow-lg"
+            className="w-full sm:w-auto px-6 py-3.5 sm:px-10 sm:py-4 bg-white text-indigo-600 rounded-xl sm:rounded-2xl font-bold uppercase tracking-wider hover:bg-indigo-50 transition-colors shadow-lg text-center cursor-pointer text-xs sm:text-sm"
           >
               Submit Complaint
           </button>
@@ -167,25 +167,25 @@ export default function EmployeeDashboard() {
       {/* Complaint Modal */}
       {isComplaintModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden shadow-2xl">
-            <div className="p-8 pb-0 flex justify-between items-center">
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Submit Feedback</h3>
+          <div className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-2xl sm:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden shadow-2xl">
+            <div className="p-5 sm:p-8 pb-0 flex justify-between items-center">
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">Submit Feedback</h3>
                 <button onClick={() => setIsComplaintModalOpen(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-slate-400">
                     <X className="w-5 h-5" />
                 </button>
             </div>
-            <form onSubmit={handleSubmitComplaint} className="p-8 space-y-6">
+            <form onSubmit={handleSubmitComplaint} className="p-5 sm:p-8 space-y-4 sm:space-y-6">
                 {message.text && (
-                    <div className={`p-4 rounded-xl text-sm font-bold ${message.type === 'success' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
+                    <div className={`p-4 rounded-xl text-xs sm:text-sm font-bold ${message.type === 'success' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
                         {message.text}
                     </div>
                 )}
                 <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Message</label>
+                    <label className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">Message</label>
                     <textarea 
                         rows={4}
                         required
-                        className="w-full p-5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500/20 text-slate-900 dark:text-white"
+                        className="w-full p-4 sm:p-5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500/20 text-slate-900 dark:text-white text-xs sm:text-sm"
                         placeholder="Describe your issue or suggestion..."
                         value={complaintText}
                         onChange={e => setComplaintText(e.target.value)}
@@ -193,7 +193,7 @@ export default function EmployeeDashboard() {
                 </div>
                 <button 
                     disabled={submitting}
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-2xl font-bold uppercase tracking-wider flex items-center justify-center gap-3 transition-all"
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-bold uppercase tracking-wider flex items-center justify-center gap-3 transition-all cursor-pointer text-xs sm:text-sm"
                 >
                     {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Send className="w-4 h-4" /> Submit Note</>}
                 </button>

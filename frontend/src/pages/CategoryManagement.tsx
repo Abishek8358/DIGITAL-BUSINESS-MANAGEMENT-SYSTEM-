@@ -58,11 +58,11 @@ export default function CategoryManagement() {
     <div className="max-w-4xl mx-auto space-y-10 pb-20">
       {/* Header */}
       <div className="flex flex-col items-center text-center space-y-4">
-        <div className="w-16 h-16 bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl flex items-center justify-center border border-indigo-100 dark:border-indigo-500/20 shadow-sm">
-            <Tags className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
+        <div className="w-12 h-12 sm:w-16 sm:h-16 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl sm:rounded-2xl flex items-center justify-center border border-indigo-100 dark:border-indigo-500/20 shadow-sm">
+            <Tags className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-600 dark:text-indigo-400" />
         </div>
         <div className="space-y-1">
-            <h1 className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight">Category Settings</h1>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">Category Settings</h1>
             <p className="text-slate-500 font-medium max-w-sm">
                 Manage and organize your products into categories.
             </p>
@@ -70,8 +70,8 @@ export default function CategoryManagement() {
       </div>
 
       {/* Action Module */}
-      <div className="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-xl relative overflow-hidden group">
-        <form onSubmit={handleAdd} className="flex flex-col md:flex-row gap-5 relative z-10">
+      <div className="bg-white dark:bg-slate-900 p-4 sm:p-8 rounded-2xl sm:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-xl relative overflow-hidden group">
+        <form onSubmit={handleAdd} className="flex flex-col sm:flex-row gap-4 sm:gap-5 relative z-10">
           <div className="flex-1 relative">
             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1 mb-2 block">Category Name</label>
             <div className="relative">
@@ -79,7 +79,7 @@ export default function CategoryManagement() {
                 <input 
                 type="text" 
                 placeholder="e.g. Electronics, Clothing..."
-                className="w-full pl-12 pr-6 py-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-semibold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                className="w-full pl-12 pr-6 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-2xl text-sm font-semibold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm"
                 value={newCategory}
                 onChange={e => setNewCategory(e.target.value)}
                 />
@@ -89,7 +89,7 @@ export default function CategoryManagement() {
             <button 
                 type="submit"
                 disabled={addLoading || !newCategory.trim()}
-                className="w-full md:w-auto px-10 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold uppercase tracking-wider flex items-center justify-center gap-3 disabled:opacity-50 transition-all shadow-lg shadow-indigo-600/20 active:scale-95"
+                className="w-full sm:w-auto px-6 py-3.5 sm:px-10 sm:py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl sm:rounded-2xl font-bold uppercase tracking-wider flex items-center justify-center gap-2 sm:gap-3 disabled:opacity-50 transition-all shadow-lg shadow-indigo-600/20 active:scale-95 cursor-pointer"
             >
                 {addLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />} Add Category
             </button>
@@ -103,8 +103,8 @@ export default function CategoryManagement() {
       </div>
 
       {/* Registry Table */}
-      <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden relative group">
-        <div className="p-8 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 flex items-center justify-between">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden relative group">
+        <div className="p-4 sm:p-8 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 flex items-center justify-between">
           <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider">
             Current Categories <span className="text-slate-900 dark:text-white ml-2">({categories.length})</span>
           </h3>
