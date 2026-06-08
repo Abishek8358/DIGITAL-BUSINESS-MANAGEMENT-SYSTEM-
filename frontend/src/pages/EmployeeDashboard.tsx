@@ -53,8 +53,8 @@ export default function EmployeeDashboard() {
   );
 
   const statCards = [
-    { name: "Today's Sales", value: stats?.todaySalesCount || 0, icon: ShoppingBag, color: 'text-indigo-600 dark:text-indigo-400', bg: 'bg-indigo-50 dark:bg-indigo-500/10' },
-    { name: "Today's Revenue", value: `₹${(stats?.todayRevenue || 0).toLocaleString()}`, icon: DollarSign, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-500/10' },
+    { name: "Today's Sales", value: stats?.todaySalesCount || 0, icon: ShoppingBag, gradient: 'from-blue-500 to-indigo-600 dark:from-blue-600/90 dark:to-indigo-700/90' },
+    { name: "Today's Revenue", value: `₹${(stats?.todayRevenue || 0).toLocaleString()}`, icon: DollarSign, gradient: 'from-emerald-500 to-teal-600 dark:from-emerald-500/90 dark:to-teal-700/90' },
   ];
 
   return (
@@ -81,13 +81,17 @@ export default function EmployeeDashboard() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
         {statCards.map((card) => (
-          <div key={card.name} className="bg-white dark:bg-slate-900 p-5 sm:p-8 rounded-2xl sm:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-xl flex items-center gap-4 sm:gap-8 group hover:-translate-y-1 transition-all">
-            <div className={`${card.bg} w-14 h-14 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl flex items-center justify-center shadow-inner shrink-0`}>
+          <div 
+            key={card.name} 
+            className={`bg-gradient-to-br ${card.gradient} p-6 sm:p-8 rounded-2xl sm:rounded-[2.5rem] border border-white/10 shadow-lg hover:-translate-y-1 hover:scale-[1.01] hover:shadow-xl transition-all duration-300 flex items-center gap-6 group relative overflow-hidden`}
+          >
+            <div className="absolute -right-4 -bottom-4 w-28 h-28 rounded-full bg-white/10 opacity-30 group-hover:scale-150 transition-transform duration-500 pointer-events-none" />
+            <div className="bg-white/10 w-14 h-14 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-inner shrink-0 text-white">
               <card.icon className="w-6 h-6 sm:w-8 sm:h-8" />
             </div>
             <div>
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 sm:mb-2">{card.name}</p>
-              <h3 className="text-2xl sm:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">{card.value}</h3>
+              <p className="text-xs font-bold text-white/70 uppercase tracking-wider mb-1 sm:mb-2">{card.name}</p>
+              <h3 className="text-2xl sm:text-4xl font-black text-white tracking-tight">{card.value}</h3>
             </div>
           </div>
         ))}

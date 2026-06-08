@@ -110,17 +110,17 @@ export default function AdminDashboard() {
   );
 
   const mainStats = [
-    { name: 'Total Revenue', value: analytics?.summary?.total_revenue || stats?.monthlyRevenue || 0, icon: DollarSign, color: 'text-indigo-600', bg: 'bg-indigo-50 dark:bg-indigo-500/10', isMoney: true },
-    { name: 'Total Profit', value: analytics?.profit || 0, icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-500/10', isMoney: true },
-    { name: 'Total Sales', value: analytics?.summary?.total_sales || stats?.totalSales || 0, icon: ShoppingBag, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-500/10', isMoney: false },
-    { name: 'Total Customers', value: analytics?.customers?.total || stats?.totalCustomers || 0, icon: Users, color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-500/10', isMoney: false },
+    { name: 'Total Sales', value: analytics?.summary?.total_sales || stats?.totalSales || 0, icon: ShoppingBag, isMoney: false, gradient: 'from-blue-500 to-indigo-600 dark:from-blue-600/90 dark:to-indigo-700/90' },
+    { name: 'Revenue', value: analytics?.summary?.total_revenue || stats?.monthlyRevenue || 0, icon: DollarSign, isMoney: true, gradient: 'from-indigo-500 to-purple-600 dark:from-indigo-600/90 dark:to-purple-700/90' },
+    { name: 'Profit', value: analytics?.profit || 0, icon: TrendingUp, isMoney: true, gradient: 'from-emerald-400 to-teal-600 dark:from-emerald-500/90 dark:to-teal-700/90' },
+    { name: 'Products', value: analytics?.stock?.total_products || stats?.totalProducts || 0, icon: Package, isMoney: false, gradient: 'from-purple-500 to-pink-600 dark:from-purple-600/90 dark:to-pink-700/90' },
+    { name: 'Customers', value: analytics?.customers?.total || stats?.totalCustomers || 0, icon: Users, isMoney: false, gradient: 'from-amber-500 to-orange-600 dark:from-amber-600/90 dark:to-orange-700/90' },
   ];
 
   const stockStats = [
-    { name: 'Total Products', value: analytics?.stock?.total_products || stats?.totalProducts || 0, icon: Package, color: 'text-slate-600', bg: 'bg-slate-50 dark:bg-slate-500/10' },
-    { name: 'Low Stock', value: analytics?.stock?.low_stock_count || (stats?.lowStock?.length || 0), icon: AlertTriangle, color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-500/10' },
-    { name: 'Out of Stock', value: analytics?.stock?.out_of_stock_count || 0, icon: Zap, color: 'text-red-600', bg: 'bg-red-50 dark:bg-red-500/10' },
-    { name: 'Total Stock', value: analytics?.stock?.total_stock || 0, icon: Activity, color: 'text-indigo-600', bg: 'bg-indigo-50 dark:bg-indigo-500/10' },
+    { name: 'Low Stock', value: analytics?.stock?.low_stock_count || (stats?.lowStock?.length || 0), icon: AlertTriangle, color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-500/10' },
+    { name: 'Out of Stock', value: analytics?.stock?.out_of_stock_count || 0, icon: Zap, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-500/10' },
+    { name: 'Total Stock', value: analytics?.stock?.total_stock || 0, icon: Activity, color: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-500/10' },
   ];
 
   return (
@@ -138,7 +138,7 @@ export default function AdminDashboard() {
         </div>
 
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-inner overflow-x-auto mobile-scrollbar-hide max-w-full">
+          <div className="flex items-center p-1.5 bg-slate-100 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-inner overflow-x-auto mobile-scrollbar-hide max-w-full">
             {[
               { id: 'today', label: 'Today' },
               { id: 'week', label: 'Week' },
@@ -148,7 +148,7 @@ export default function AdminDashboard() {
               <button
                 key={f.id}
                 onClick={() => setFilter(f.id)}
-                className={`px-4 sm:px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 whitespace-nowrap ${filter === f.id ? 'bg-white dark:bg-slate-800 text-indigo-600 shadow-sm' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'}`}
+                className={`px-4 sm:px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 whitespace-nowrap cursor-pointer ${filter === f.id ? 'bg-white dark:bg-slate-800 text-indigo-600 shadow-sm' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'}`}
               >
                 {f.label}
               </button>
@@ -156,7 +156,7 @@ export default function AdminDashboard() {
           </div>
           <button 
             onClick={fetchData}
-            className="p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-400 hover:text-indigo-600 transition-all hover:rotate-180 duration-500 shrink-0"
+            className="p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-400 hover:text-indigo-600 transition-all hover:rotate-180 duration-500 shrink-0 cursor-pointer shadow-sm"
           >
             <RefreshCcw className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
@@ -164,17 +164,20 @@ export default function AdminDashboard() {
       </div>
 
       {/* Main Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
         {mainStats.map((card) => (
-          <div key={card.name} className="bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-8 rounded-2xl sm:rounded-[2rem] lg:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm hover:flutter-shadow hover:shadow-xl transition-all group relative overflow-hidden">
-            <div className={`absolute -right-4 -bottom-4 w-24 h-24 rounded-full ${card.bg} opacity-20 group-hover:scale-150 transition-transform`} />
-            <div className="flex items-center justify-between mb-4 sm:mb-6">
-              <div className={`${card.bg} p-3 sm:p-4 rounded-xl sm:rounded-2xl group-hover:scale-110 transition-transform`}>
-                <card.icon className={`w-5 h-5 sm:w-7 sm:h-7 ${card.color}`} />
+          <div 
+            key={card.name} 
+            className={`bg-gradient-to-br ${card.gradient} p-5 sm:p-6 rounded-2xl sm:rounded-3xl border border-white/10 shadow-lg hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-xl transition-all duration-300 group relative overflow-hidden`}
+          >
+            <div className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-white/10 opacity-30 group-hover:scale-150 transition-transform duration-500 pointer-events-none" />
+            <div className="flex items-center justify-between mb-6">
+              <div className="bg-white/10 p-3 rounded-xl sm:rounded-2xl group-hover:rotate-6 transition-transform">
+                <card.icon className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
               </div>
             </div>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{card.name}</p>
-            <h3 className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+            <p className="text-[10px] font-black text-white/70 uppercase tracking-widest mb-1">{card.name}</p>
+            <h3 className="text-lg sm:text-xl lg:text-2xl font-black text-white tracking-tight">
               {card.isMoney ? `₹${Number(card.value).toLocaleString()}` : Number(card.value).toLocaleString()}
             </h3>
           </div>
@@ -183,7 +186,7 @@ export default function AdminDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
         {/* Sales Trend Line Chart */}
-        <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-10 rounded-2xl sm:rounded-[2rem] lg:rounded-[3rem] border border-slate-200 dark:border-slate-800 h-[300px] sm:h-[400px] lg:h-[500px] flex flex-col shadow-sm">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-10 rounded-2xl sm:rounded-[2rem] lg:rounded-[3rem] border border-slate-200 dark:border-slate-800 h-[300px] sm:h-[400px] lg:h-[500px] flex flex-col shadow-premium">
           <div className="flex items-center justify-between mb-4 sm:mb-8">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl flex items-center justify-center">
@@ -208,7 +211,7 @@ export default function AdminDashboard() {
                 <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#94a3b8', fontWeight: 900}} dy={15} />
                 <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#94a3b8', fontWeight: 900}} />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)', border: 'none', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
+                  contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)', border: 'none', borderRadius: '16px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
                   itemStyle={{ color: '#4f46e5', fontWeight: 800, textTransform: 'uppercase', fontSize: '10px' }}
                 />
                 <Area type="monotone" dataKey="revenue" stroke="#4f46e5" strokeWidth={4} fillOpacity={1} fill="url(#colorRevenue)" />
@@ -218,7 +221,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Stock Status Summary */}
-        <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-8 rounded-2xl sm:rounded-[2rem] lg:rounded-[3rem] border border-slate-200 dark:border-slate-800 flex flex-col h-auto lg:h-[500px] shadow-sm">
+        <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-8 rounded-2xl sm:rounded-[2rem] lg:rounded-[3rem] border border-slate-200 dark:border-slate-800 flex flex-col h-auto lg:h-[500px] shadow-premium">
           <div className="flex items-center justify-between mb-6 sm:mb-10">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-amber-50 dark:bg-amber-500/10 rounded-xl flex items-center justify-center">
@@ -227,16 +230,16 @@ export default function AdminDashboard() {
               <h3 className="text-base sm:text-lg lg:text-xl font-bold text-slate-900 dark:text-white tracking-tight uppercase italic">Stock <span className="text-amber-500">Summary</span></h3>
             </div>
           </div>
-          <div className="grid grid-cols-1 gap-3 sm:gap-4 flex-1">
+          <div className="grid grid-cols-1 gap-3 sm:gap-4 flex-1 justify-center">
             {stockStats.map((s) => (
-              <div key={s.name} className="p-4 sm:p-6 rounded-xl sm:rounded-[2rem] bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 flex items-center justify-between group hover:border-indigo-200 transition-all">
+              <div key={s.name} className="p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 flex items-center justify-between group hover:border-indigo-200 transition-all shadow-sm">
                 <div className="flex items-center gap-3 sm:gap-4">
-                  <div className={`${s.bg} p-2 sm:p-3 rounded-lg sm:rounded-xl`}>
-                    <s.icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <div className={`${s.bg} p-2.5 sm:p-3 rounded-xl`}>
+                    <s.icon className={`w-4 h-4 sm:w-5 sm:h-5 ${s.color}`} />
                   </div>
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{s.name}</span>
                 </div>
-                <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">{s.value}</span>
+                <span className="text-lg sm:text-xl font-black text-slate-900 dark:text-white">{s.value}</span>
               </div>
             ))}
           </div>
@@ -328,7 +331,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Revenue History (Fixed Sorting) */}
-        <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-10 rounded-2xl sm:rounded-[2rem] lg:rounded-[3rem] border border-slate-200 dark:border-slate-800 h-[300px] sm:h-[400px] lg:h-[500px] flex flex-col shadow-sm">
+        <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-10 rounded-2xl sm:rounded-[2rem] lg:rounded-[3rem] border border-slate-200 dark:border-slate-800 h-[300px] sm:h-[400px] lg:h-[500px] flex flex-col shadow-premium">
            <div className="flex items-center justify-between mb-4 sm:mb-8">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 sm:w-10 sm:h-10 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl flex items-center justify-center">
@@ -343,11 +346,17 @@ export default function AdminDashboard() {
            <div className="flex-1 w-full">
               <ResponsiveContainer width="100%" height="100%">
                  <BarChart data={stats?.revenueHistory || []}>
+                    <defs>
+                      <linearGradient id="colorBar" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#6366f1" />
+                        <stop offset="100%" stopColor="#4f46e5" />
+                      </linearGradient>
+                    </defs>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.05)" />
                     <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fontSize: 9, fill: '#94a3b8', fontWeight: 900}} />
                     <YAxis axisLine={false} tickLine={false} tick={{fontSize: 9, fill: '#94a3b8', fontWeight: 900}} />
                     <Tooltip cursor={{fill: 'rgba(0,0,0,0.02)'}} />
-                    <Bar dataKey="revenue" fill="#4f46e5" radius={[10, 10, 0, 0]} barSize={24} />
+                    <Bar dataKey="revenue" fill="url(#colorBar)" radius={[6, 6, 0, 0]} barSize={16} />
                  </BarChart>
               </ResponsiveContainer>
            </div>

@@ -79,7 +79,7 @@ export default function CustomerManagement() {
             <input 
               type="text" 
               placeholder="Search by name or mobile number..."
-              className="w-full pl-12 pr-4 py-3 sm:py-4 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-2xl text-sm font-semibold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm"
+              className="input-premium pl-12"
               value={search}
               onChange={e => setSearch(e.target.value)}
             />

@@ -79,7 +79,7 @@ export default function CategoryManagement() {
                 <input 
                 type="text" 
                 placeholder="e.g. Electronics, Clothing..."
-                className="w-full pl-12 pr-6 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-2xl text-sm font-semibold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm"
+                className="input-premium pl-12"
                 value={newCategory}
                 onChange={e => setNewCategory(e.target.value)}
                 />
@@ -89,7 +89,7 @@ export default function CategoryManagement() {
             <button 
                 type="submit"
                 disabled={addLoading || !newCategory.trim()}
-                className="w-full sm:w-auto px-6 py-3.5 sm:px-10 sm:py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl sm:rounded-2xl font-bold uppercase tracking-wider flex items-center justify-center gap-2 sm:gap-3 disabled:opacity-50 transition-all shadow-lg shadow-indigo-600/20 active:scale-95 cursor-pointer"
+                className="btn-premium w-full sm:w-auto flex items-center justify-center gap-2 sm:gap-3 disabled:opacity-55"
             >
                 {addLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />} Add Category
             </button>

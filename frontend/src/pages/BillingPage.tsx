@@ -402,7 +402,7 @@ export default function BillingPage() {
             <input
               type="text"
               placeholder="Search for products or brands..."
-              className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-indigo-500/5 text-slate-900 dark:text-white font-bold text-sm outline-none transition-all shadow-inner"
+              className="input-premium pl-12"
               value={search}
               onChange={e => setSearch(e.target.value)}
             />
@@ -413,8 +413,8 @@ export default function BillingPage() {
               <button
                 onClick={resetSelection}
                 className={`px-4 sm:px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 flex-shrink-0 border ${selectedCategoryId === 'all'
-                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-600/20'
-                    : 'bg-white dark:bg-slate-900 text-slate-400 dark:text-slate-500 border-slate-200 dark:border-slate-800 hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-600/25 active:scale-95'
+                    : 'bg-white dark:bg-slate-900 text-slate-400 dark:text-slate-500 border-slate-200 dark:border-slate-800 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-500/20 active:scale-95'
                   }`}
               >
                 <Globe className="w-4 h-4" /> Categories
@@ -462,12 +462,12 @@ export default function BillingPage() {
                   <button
                     key={cat.id}
                     onClick={() => selectCategory(cat.id)}
-                    className="bg-white dark:bg-slate-900 p-3 sm:p-6 rounded-xl sm:rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:border-indigo-100 dark:hover:border-indigo-900/40 transition-all text-center group"
+                    className="card-premium p-4 sm:p-6 text-center group flex flex-col items-center justify-center cursor-pointer border-none"
                   >
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl sm:rounded-2xl flex items-center justify-center border border-indigo-100 dark:border-indigo-500/20 group-hover:scale-110 group-hover:rotate-3 transition-transform">
+                    <div className="w-12 h-12 mb-3 bg-gradient-to-tr from-indigo-50 to-indigo-100 dark:from-indigo-500/10 dark:to-indigo-500/20 rounded-2xl flex items-center justify-center border border-indigo-100 dark:border-indigo-500/20 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                       <Tags className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-600 dark:text-indigo-400" />
                     </div>
-                    <p className="text-[9px] sm:text-[11px] font-bold text-slate-900 dark:text-white uppercase tracking-widest truncate">{cat.name}</p>
+                    <p className="text-[10px] sm:text-xs font-bold text-slate-900 dark:text-white uppercase tracking-widest truncate max-w-full">{cat.name}</p>
                   </button>
                 ))}
               </div>
@@ -479,9 +479,9 @@ export default function BillingPage() {
                   <button
                     key={p.id}
                     onClick={() => selectProduct(p.id)}
-                    className="bg-white dark:bg-slate-900 p-3 sm:p-4 rounded-xl sm:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:border-purple-100 dark:hover:border-purple-900/40 transition-all text-center group"
+                    className="card-premium p-3 sm:p-4 text-center group cursor-pointer border-none"
                   >
-                    <div className="aspect-square rounded-lg sm:rounded-[2rem] bg-slate-50 dark:bg-slate-950 mb-3 overflow-hidden shadow-inner">
+                    <div className="aspect-square rounded-2xl bg-slate-50 dark:bg-slate-950 mb-3 overflow-hidden shadow-inner border border-slate-100 dark:border-slate-800/50">
                       <img
                         src={p.imageUrl || DEFAULT_PRODUCT_IMAGE}
                         alt={p.name}
@@ -492,7 +492,7 @@ export default function BillingPage() {
                     <p className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-widest truncate">{p.name}</p>
                   </button>
                 ))}
-                <button onClick={resetSelection} className="aspect-square flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-[2.5rem] text-slate-400 hover:text-red-500 hover:border-red-200 transition-all gap-2 cursor-pointer">
+                <button onClick={resetSelection} className="aspect-square flex flex-col items-center justify-center border border-dashed border-slate-300 dark:border-slate-800 rounded-2xl sm:rounded-3xl text-slate-400 hover:text-red-500 hover:border-red-500/30 hover:bg-red-500/5 transition-all gap-2 cursor-pointer bg-white dark:bg-slate-900 shadow-sm hover:shadow-md">
                   <X className="w-5 h-5 sm:w-6 sm:h-6" />
                   <span className="text-[10px] font-bold uppercase tracking-widest">Reset</span>
                 </button>
@@ -505,12 +505,12 @@ export default function BillingPage() {
                   <button
                     key={b.id}
                     onClick={() => setSelectedBrandId(b.id)}
-                    className="px-4 sm:px-8 py-3 sm:py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-[1.5rem] shadow-sm hover:shadow-md hover:border-emerald-100 dark:hover:border-emerald-900/40 transition-all text-xs font-bold text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-2 sm:gap-3 group shrink-0"
+                    className="card-premium px-4 sm:px-8 py-3 sm:py-4 cursor-pointer text-xs font-bold text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-2 sm:gap-3 group shrink-0 border-none"
                   >
                     <Layers className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform" /> {b.name}
                   </button>
                 ))}
-                <button onClick={() => selectCategory(selectedCategoryId as number)} className="px-4 sm:px-8 py-3 sm:py-4 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-[1.5rem] text-slate-400 text-xs font-bold uppercase hover:text-indigo-600 hover:border-indigo-200 transition-all cursor-pointer">Back</button>
+                <button onClick={() => selectCategory(selectedCategoryId as number)} className="px-4 sm:px-8 py-3 sm:py-4 border border-dashed border-slate-300 dark:border-slate-800 rounded-xl sm:rounded-2xl text-slate-400 text-xs font-bold uppercase hover:text-indigo-600 hover:border-indigo-500/20 transition-all cursor-pointer bg-white dark:bg-slate-900 shadow-sm hover:shadow-md">Back</button>
               </div>
             )}
           </div>
@@ -521,7 +521,7 @@ export default function BillingPage() {
           {showProductGrid && (
             <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6 animate-in fade-in duration-500">
               {filteredVariants.length === 0 ? (
-                <div className="col-span-full py-16 sm:py-20 flex flex-col items-center justify-center bg-white dark:bg-slate-900 rounded-2xl sm:rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800 text-slate-400">
+                <div className="col-span-full py-16 sm:py-20 flex flex-col items-center justify-center card-premium border border-dashed border-slate-300 dark:border-slate-800 text-slate-400">
                   <Package className="w-12 h-12 sm:w-16 sm:h-16 mb-4 opacity-10" />
                   <p className="font-bold uppercase tracking-widest text-xs sm:text-sm">No products found.</p>
                 </div>
@@ -531,15 +531,15 @@ export default function BillingPage() {
                     key={variant.variantId}
                     onClick={() => addToCart(variant)}
                     className={`
-                      bg-white dark:bg-slate-900 p-3 sm:p-4 rounded-2xl sm:rounded-[2.5rem] border transition-all relative
+                      card-premium p-3 sm:p-4 relative cursor-pointer group
                       ${variant.stock <= 0
-                        ? 'border-red-200 dark:border-red-900/40 shadow-sm opacity-60 cursor-not-allowed'
+                        ? 'border-red-200 dark:border-red-900/40 opacity-60 cursor-not-allowed hover:translate-y-0 hover:shadow-none'
                         : variant.stock <= (variant.minimumStock || 0)
-                          ? 'border-red-200 dark:border-red-900/40 shadow-sm cursor-pointer group hover:shadow-2xl hover:-translate-y-1'
-                          : 'border-slate-100 dark:border-slate-800 shadow-md hover:border-indigo-100 dark:hover:border-indigo-900/40 cursor-pointer group hover:shadow-2xl hover:-translate-y-1'}
+                          ? 'border-red-400 dark:border-red-900/60 shadow-red-500/5'
+                          : ''}
                     `}
                   >
-                    <div className="aspect-square rounded-xl sm:rounded-[2rem] bg-slate-50 dark:bg-slate-950 mb-3 sm:mb-4 overflow-hidden relative shadow-inner">
+                    <div className="aspect-square rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-950 mb-3 sm:mb-4 overflow-hidden relative shadow-inner border border-slate-100 dark:border-slate-850">
                       <img
                         src={variant.imageUrl || DEFAULT_PRODUCT_IMAGE}
                         alt={variant.variantName}
@@ -932,7 +932,7 @@ export default function BillingPage() {
             </div>
 
             {/* GST Breakdown */}
-            <div className="px-8 py-4 bg-slate-50 dark:bg-slate-950 border-y border-slate-100 dark:border-slate-800 space-y-2">
+            <div className="px-8 py-6 bg-slate-50 dark:bg-slate-950 border-y border-dashed border-slate-200 dark:border-slate-800/80 space-y-3">
               <div className="flex justify-between text-xs font-bold text-slate-400 uppercase tracking-widest">
                 <span>Base Amount</span>
                 <span className="text-slate-600 dark:text-slate-300">₹{Number(receipt.subtotal).toFixed(2)}</span>
@@ -945,7 +945,7 @@ export default function BillingPage() {
                 <span>SGST (Incl.)</span>
                 <span className="text-slate-600 dark:text-slate-300">₹{(Number(receipt.gstTotal) / 2).toFixed(2)}</span>
               </div>
-              <div className="h-px w-full bg-slate-200 dark:bg-slate-800 my-2" />
+              <div className="border-t border-dashed border-slate-300 dark:border-slate-700 h-0 my-3" />
               <div className="flex justify-between items-end">
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Grand Total</span>
                 <span className="text-3xl font-bold text-slate-900 dark:text-white tracking-tighter">₹{Number(receipt.grandTotal).toFixed(2)}</span>

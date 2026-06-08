@@ -122,7 +122,7 @@ export default function DashboardLayout() {
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">SaaS System</p>
               </div>
             </div>
-            <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-slate-500 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
+            <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-slate-500 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer">
               <X className="w-6 h-6" />
             </button>
           </div>
@@ -136,10 +136,10 @@ export default function DashboardLayout() {
                 to={item.path}
                 onClick={() => setIsSidebarOpen(false)}
                 className={({ isActive }) => `
-                  flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
+                  flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group border-l-2
                   ${isActive
-                    ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/40'}
+                    ? 'border-indigo-600 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold'
+                    : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/40'}
                 `}
               >
                 <item.icon className="w-5 h-5 transition-transform group-hover:scale-110" />
@@ -166,7 +166,7 @@ export default function DashboardLayout() {
             </div>
             <button
               onClick={handleLogout}
-              className="w-full flex items-center justify-center gap-2 py-3.5 text-xs font-bold text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-xl transition-all border border-slate-200 dark:border-slate-700 hover:border-red-200 uppercase tracking-widest"
+              className="w-full flex items-center justify-center gap-2 py-3.5 text-xs font-bold text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-xl transition-all border border-slate-200 dark:border-slate-700 hover:border-red-200 uppercase tracking-widest cursor-pointer"
             >
               <LogOut className="w-4 h-4" /> Sign Out
             </button>
@@ -175,20 +175,28 @@ export default function DashboardLayout() {
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 bg-white dark:bg-slate-950 transition-colors duration-300">
+      <div className="flex-1 flex flex-col min-w-0 bg-[#f8fafc] dark:bg-[#090d16] transition-colors duration-300">
         {/* Header */}
-        <header className="h-14 lg:h-20 flex items-center justify-between px-4 lg:px-10 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 backdrop-blur-xl sticky top-0 z-40">
+        <header className="h-14 lg:h-20 flex items-center justify-between px-4 lg:px-10 border-b border-slate-200 dark:border-slate-800 bg-[#f8fafc]/50 dark:bg-[#090d16]/50 backdrop-blur-xl sticky top-0 z-40">
           <div className="flex items-center gap-6">
-            <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden text-slate-500 p-1.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+            <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden text-slate-500 p-1.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm cursor-pointer">
               <Menu className="w-5 h-5" />
             </button>
           </div>
 
           <div className="flex items-center gap-4">
+            <button
+              onClick={toggleDarkMode}
+              className="p-2.5 bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl border border-slate-200 dark:border-slate-800 transition-all cursor-pointer shadow-sm"
+              title="Toggle theme"
+            >
+              {darkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4 text-indigo-500" />}
+            </button>
+
             <div className="h-8 w-[1px] bg-slate-200 dark:bg-slate-800 hidden md:block mx-2" />
 
             <div className="flex items-center gap-2.5 bg-indigo-600 px-5 py-2.5 rounded-xl text-[10px] font-black text-white uppercase tracking-widest hidden md:flex shadow-lg shadow-indigo-600/20 active:scale-95 transition-all">
-              <Zap className="w-4 h-4" /> Billing Online
+              <Zap className="w-4 h-4 animate-pulse" /> Billing Online
             </div>
           </div>
         </header>
